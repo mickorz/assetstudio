@@ -76,6 +76,11 @@ namespace AssetStudio.GUI
         private int nextGObject;
         private List<TreeNode> treeSrcResults = new List<TreeNode>();
 
+        //container hierarchy
+        private List<AssetItem> containerVisibleAssets = new List<AssetItem>();
+        private int nextContainerNode;
+        private List<TreeNode> containerSrcResults = new List<TreeNode>();
+
         private string openDirectoryBackup = string.Empty;
         private string saveDirectoryBackup = string.Empty;
 
@@ -426,6 +431,13 @@ namespace AssetStudio.GUI
             classesListView.EndUpdate();
 
             var types = exportableAssets.Select(x => x.Type).Distinct().OrderBy(x => x.ToString()).ToArray();
+
+            var containerNodes = await Task.Run(BuildContainerHierarchy);
+            containerTreeView.BeginUpdate();
+            containerTreeView.Nodes.AddRange(containerNodes.ToArray());
+            containerTreeView.EndUpdate();
+            containerNodes.Clear();
+
             foreach (var type in types)
             {
                 var typeItem = new ToolStripMenuItem
@@ -667,8 +679,225 @@ namespace AssetStudio.GUI
                     listSearch.Select();
                     UpdateAssetCountStatus();
                     break;
+                case 3:
+                    containerTreeSearch.Select();
+                    break;
             }
         }
+
+        #region Container Hierarchy Events
+
+        private void containerTreeView_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node is ContainerTreeNode containerNode)
+            {
+                containerListView.BeginUpdate();
+                containerVisibleAssets = containerNode.Assets;
+                containerListView.VirtualListSize = containerVisibleAssets.Count;
+                containerListView.EndUpdate();
+            }
+        }
+
+        private void containerTreeView_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            foreach (TreeNode childNode in e.Node.Nodes)
+            {
+                childNode.Checked = e.Node.Checked;
+            }
+
+            if (e.Node is ContainerTreeNode containerNode && e.Node == containerTreeView.SelectedNode)
+            {
+                containerListView.BeginUpdate();
+                for (int i = 0; i < containerVisibleAssets.Count; i++)
+                {
+                    containerListView.Items[i].Checked = e.Node.Checked;
+                }
+                containerListView.EndUpdate();
+            }
+        }
+
+        private void containerTreeSearch_TextChanged(object sender, EventArgs e)
+        {
+            containerSrcResults.Clear();
+            nextContainerNode = 0;
+        }
+
+        private void containerTreeSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && !string.IsNullOrEmpty(containerTreeSearch.Text))
+            {
+                if (containerSrcResults.Count == 0)
+                {
+                    try
+                    {
+                        Regex.Match("", containerTreeSearch.Text, RegexOptions.IgnoreCase);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("Invalid Regex.\n" + ex.Message);
+                        return;
+                    }
+                    var regex = new Regex(containerTreeSearch.Text, RegexOptions.IgnoreCase);
+                    foreach (TreeNode node in containerTreeView.Nodes)
+                    {
+                        TreeNodeSearch(regex, node);
+                    }
+                }
+                if (containerSrcResults.Count > 0)
+                {
+                    if (e.Shift)
+                    {
+                        foreach (var node in containerSrcResults)
+                        {
+                            var tempNode = node;
+                            if (e.Alt)
+                            {
+                                while (tempNode.Parent != null)
+                                {
+                                    tempNode = tempNode.Parent;
+                                }
+                            }
+                            tempNode.EnsureVisible();
+                            tempNode.Checked = e.Control;
+                        }
+                        containerTreeView.SelectedNode = containerSrcResults[0];
+                    }
+                    else
+                    {
+                        if (nextContainerNode >= containerSrcResults.Count)
+                        {
+                            nextContainerNode = 0;
+                        }
+                        var node = containerSrcResults[nextContainerNode];
+                        if (e.Alt)
+                        {
+                            while (node.Parent != null)
+                            {
+                                node = node.Parent;
+                            }
+                        }
+
+                        node.EnsureVisible();
+                        node.Checked = e.Control;
+                        containerTreeView.SelectedNode = containerSrcResults[nextContainerNode];
+                        nextContainerNode++;
+                    }
+                }
+            }
+        }
+
+        private void containerListView_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
+        {
+            if (e.ItemIndex >= 0 && e.ItemIndex < containerVisibleAssets.Count)
+            {
+                e.Item = containerVisibleAssets[e.ItemIndex];
+            }
+        }
+
+        private void containerListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            previewPanel.BackgroundImage = Properties.Resources.preview;
+            previewPanel.BackgroundImageLayout = ImageLayout.Center;
+            classTextBox.Visible = false;
+            assetInfoLabel.Visible = false;
+            assetInfoLabel.Text = null;
+            textPreviewBox.Visible = false;
+            fontPreviewBox.Visible = false;
+            FMODpanel.Visible = false;
+            glControl.Visible = false;
+
+            FMODreset();
+
+            lastSelectedItem = (AssetItem)e.Item;
+
+            if (e.IsSelected)
+            {
+                if (tabControl2.SelectedIndex == 1)
+                {
+                    dumpTextBox.Text = DumpAsset(lastSelectedItem.Asset);
+                }
+                if (enablePreview.Checked)
+                {
+                    PreviewAsset(lastSelectedItem);
+                    if (displayInfo.Checked && lastSelectedItem.InfoText != null)
+                    {
+                        assetInfoLabel.Text = lastSelectedItem.InfoText;
+                        assetInfoLabel.Visible = true;
+                    }
+                }
+            }
+        }
+
+        private void containerListView_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && containerListView.SelectedIndices.Count > 0)
+            {
+                goToSceneHierarchyToolStripMenuItem.Visible = false;
+                showOriginalFileToolStripMenuItem.Visible = false;
+                exportAnimatorwithselectedAnimationClipMenuItem.Visible = false;
+
+                if (containerListView.SelectedIndices.Count == 1)
+                {
+                    goToSceneHierarchyToolStripMenuItem.Visible = true;
+                    showOriginalFileToolStripMenuItem.Visible = true;
+                }
+                if (containerListView.SelectedIndices.Count >= 1)
+                {
+                    var selectedAssets = GetContainerSelectedAssets();
+                    if (selectedAssets.Any(x => x.Type == ClassIDType.Animator) && selectedAssets.Any(x => x.Type == ClassIDType.AnimationClip))
+                    {
+                        exportAnimatorwithselectedAnimationClipMenuItem.Visible = true;
+                    }
+                }
+
+                tempClipboard = containerListView.HitTest(new Point(e.X, e.Y)).SubItem.Text;
+                contextMenuStrip1.Show(containerListView, e.X, e.Y);
+            }
+        }
+
+        private List<AssetItem> GetContainerSelectedAssets()
+        {
+            var selectedAssets = new List<AssetItem>(containerListView.SelectedIndices.Count);
+            foreach (int index in containerListView.SelectedIndices)
+            {
+                selectedAssets.Add(containerVisibleAssets[index]);
+            }
+            return selectedAssets;
+        }
+
+        private List<AssetItem> GetContainerCheckedAssets()
+        {
+            var checkedAssets = new List<AssetItem>();
+            CollectCheckedContainerAssets(containerTreeView.Nodes, checkedAssets);
+            return checkedAssets;
+        }
+
+        private void CollectCheckedContainerAssets(TreeNodeCollection nodes, List<AssetItem> assets)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                if (node is ContainerTreeNode containerNode)
+                {
+                    if (node.Checked)
+                    {
+                        assets.AddRange(containerNode.Assets);
+                    }
+                    else
+                    {
+                        foreach (var asset in containerNode.Assets)
+                        {
+                            if (containerListView.Items.Contains(asset) && asset.Checked)
+                            {
+                                assets.Add(asset);
+                            }
+                        }
+                    }
+                }
+                CollectCheckedContainerAssets(node.Nodes, assets);
+            }
+        }
+
+        #endregion
 
         private void treeSearch_TextChanged(object sender, EventArgs e)
         {
@@ -1605,6 +1834,14 @@ namespace AssetStudio.GUI
             listSearch.Text = string.Empty;
             statusLabelAssetCount.Text = "";
 
+            containerTreeView.Nodes.Clear();
+            containerListView.VirtualListSize = 0;
+            containerListView.Items.Clear();
+            containerVisibleAssets.Clear();
+            containerTreeSearch.Text = string.Empty;
+            containerSrcResults.Clear();
+            nextContainerNode = 0;
+
             var count = filterTypeToolStripMenuItem.DropDownItems.Count;
             for (var i = 1; i < count; i++)
             {
@@ -1649,12 +1886,27 @@ namespace AssetStudio.GUI
 
         private void exportSelectedAssetsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ExportAssets(ExportFilter.Selected, ExportType.Convert);
+            if (tabControl1.SelectedTab == tabPage6)
+            {
+                ExportContainerAssets(ExportType.Convert);
+            }
+            else
+            {
+                ExportAssets(ExportFilter.Selected, ExportType.Convert);
+            }
         }
 
         private void showOriginalFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var selectasset = (AssetItem)assetListView.Items[assetListView.SelectedIndices[0]];
+            AssetItem selectasset;
+            if (tabControl1.SelectedTab == tabPage6)
+            {
+                selectasset = containerVisibleAssets[containerListView.SelectedIndices[0]];
+            }
+            else
+            {
+                selectasset = (AssetItem)assetListView.Items[assetListView.SelectedIndices[0]];
+            }
             var args = $"/select, \"{selectasset.SourceFile.originalPath ?? selectasset.SourceFile.fullName}\"";
             var pfi = new ProcessStartInfo("explorer.exe", args);
             Process.Start(pfi);
@@ -1664,7 +1916,9 @@ namespace AssetStudio.GUI
         {
             AssetItem animator = null;
             List<AssetItem> animationList = new List<AssetItem>();
-            var selectedAssets = GetSelectedAssets();
+            var selectedAssets = tabControl1.SelectedTab == tabPage6
+                ? GetContainerSelectedAssets()
+                : GetSelectedAssets();
             foreach (var assetPreloadData in selectedAssets)
             {
                 if (assetPreloadData.Type == ClassIDType.Animator)
@@ -1816,7 +2070,15 @@ namespace AssetStudio.GUI
 
         private void goToSceneHierarchyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var selectasset = (AssetItem)assetListView.Items[assetListView.SelectedIndices[0]];
+            AssetItem selectasset;
+            if (tabControl1.SelectedTab == tabPage6)
+            {
+                selectasset = containerVisibleAssets[containerListView.SelectedIndices[0]];
+            }
+            else
+            {
+                selectasset = (AssetItem)assetListView.Items[assetListView.SelectedIndices[0]];
+            }
             if (selectasset.TreeNode != null)
             {
                 sceneTreeView.SelectedNode = selectasset.TreeNode;
@@ -2047,6 +2309,37 @@ namespace AssetStudio.GUI
             }
             assetListView.EndUpdate();
             UpdateAssetCountStatus();
+        }
+
+        private async void ExportContainerAssets(ExportType exportType)
+        {
+            if (exportableAssets.Count > 0)
+            {
+                var saveFolderDialog = new OpenFolderDialog();
+                saveFolderDialog.InitialFolder = saveDirectoryBackup;
+                if (saveFolderDialog.ShowDialog(this) == DialogResult.OK)
+                {
+                    timer.Stop();
+                    saveDirectoryBackup = saveFolderDialog.Folder;
+                    var toExportAssets = GetContainerSelectedAssets();
+                    if (toExportAssets.Count == 0)
+                    {
+                        toExportAssets = GetContainerCheckedAssets();
+                    }
+                    if (toExportAssets.Count > 0)
+                    {
+                        await Studio.ExportAssets(saveFolderDialog.Folder, toExportAssets, exportType, Properties.Settings.Default.openAfterExport);
+                    }
+                    else
+                    {
+                        StatusStripUpdate("No assets selected in Container Hierarchy.");
+                    }
+                }
+            }
+            else
+            {
+                StatusStripUpdate("No exportable assets loaded");
+            }
         }
 
         private async void ExportAssets(ExportFilter type, ExportType exportType)

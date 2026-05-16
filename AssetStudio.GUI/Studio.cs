@@ -486,6 +486,86 @@ namespace AssetStudio.GUI
             return (productName, treeNodeCollection);
         }
 
+        public static List<ContainerTreeNode> BuildContainerHierarchy()
+        {
+            StatusStripUpdate("Building container hierarchy...");
+
+            var rootNodeMap = new Dictionary<string, ContainerTreeNode>();
+            var noContainerAssets = new List<AssetItem>();
+
+            foreach (var asset in exportableAssets)
+            {
+                if (string.IsNullOrEmpty(asset.Container))
+                {
+                    noContainerAssets.Add(asset);
+                    continue;
+                }
+
+                var containerPath = asset.Container;
+                string dirPath;
+                if (Path.HasExtension(containerPath))
+                {
+                    dirPath = Path.GetDirectoryName(containerPath)?.Replace('\\', '/') ?? "";
+                }
+                else
+                {
+                    dirPath = containerPath.TrimEnd('/');
+                }
+
+                if (string.IsNullOrEmpty(dirPath))
+                {
+                    noContainerAssets.Add(asset);
+                    continue;
+                }
+
+                if (!rootNodeMap.TryGetValue(dirPath, out var folderNode))
+                {
+                    var parts = dirPath.Split('/');
+                    var currentPath = "";
+                    ContainerTreeNode parentNode = null;
+
+                    for (int i = 0; i < parts.Length; i++)
+                    {
+                        currentPath = i == 0 ? parts[0] : currentPath + "/" + parts[i];
+                        if (!rootNodeMap.TryGetValue(currentPath, out var existingNode))
+                        {
+                            existingNode = new ContainerTreeNode(parts[i], currentPath);
+                            rootNodeMap[currentPath] = existingNode;
+
+                            if (parentNode != null)
+                            {
+                                parentNode.Nodes.Add(existingNode);
+                            }
+                        }
+                        parentNode = existingNode;
+                    }
+
+                    folderNode = rootNodeMap[dirPath];
+                }
+
+                folderNode.Assets.Add(asset);
+            }
+
+            var rootNodes = new List<ContainerTreeNode>();
+            foreach (var node in rootNodeMap.Values)
+            {
+                if (node.Parent == null)
+                {
+                    rootNodes.Add(node);
+                }
+            }
+
+            if (noContainerAssets.Count > 0)
+            {
+                var noContainerNode = new ContainerTreeNode("(No Container)", "");
+                noContainerNode.Assets.AddRange(noContainerAssets);
+                rootNodes.Add(noContainerNode);
+            }
+
+            StatusStripUpdate("Container hierarchy built.");
+            return rootNodes;
+        }
+
         public static Dictionary<string, SortedDictionary<int, TypeTreeItem>> BuildClassStructure()
         {
             var typeMap = new Dictionary<string, SortedDictionary<int, TypeTreeItem>>();

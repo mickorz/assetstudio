@@ -141,6 +141,16 @@ namespace AssetStudio.GUI
             classesListView = new System.Windows.Forms.ListView();
             columnHeader1 = new System.Windows.Forms.ColumnHeader();
             columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            tabPage6 = new System.Windows.Forms.TabPage();
+            containerSplitContainer = new System.Windows.Forms.SplitContainer();
+            containerTreeSearch = new System.Windows.Forms.TextBox();
+            containerTreeView = new System.Windows.Forms.TreeView();
+            containerListView = new System.Windows.Forms.ListView();
+            containerColumnName = new System.Windows.Forms.ColumnHeader();
+            containerColumnContainer = new System.Windows.Forms.ColumnHeader();
+            containerColumnType = new System.Windows.Forms.ColumnHeader();
+            containerColumnPathID = new System.Windows.Forms.ColumnHeader();
+            containerColumnSize = new System.Windows.Forms.ColumnHeader();
             progressbarPanel = new System.Windows.Forms.Panel();
             progressBar1 = new System.Windows.Forms.ProgressBar();
             tabControl2 = new System.Windows.Forms.TabControl();
@@ -184,6 +194,11 @@ namespace AssetStudio.GUI
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
             tabPage3.SuspendLayout();
+            tabPage6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)containerSplitContainer).BeginInit();
+            containerSplitContainer.Panel1.SuspendLayout();
+            containerSplitContainer.Panel2.SuspendLayout();
+            containerSplitContainer.SuspendLayout();
             progressbarPanel.SuspendLayout();
             tabControl2.SuspendLayout();
             tabPage4.SuspendLayout();
@@ -869,6 +884,7 @@ namespace AssetStudio.GUI
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
             tabControl1.Controls.Add(tabPage3);
+            tabControl1.Controls.Add(tabPage6);
             tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             tabControl1.Location = new System.Drawing.Point(0, 0);
             tabControl1.Name = "tabControl1";
@@ -1013,7 +1029,101 @@ namespace AssetStudio.GUI
             columnHeader2.DisplayIndex = 0;
             columnHeader2.Text = "ID";
             columnHeader2.Width = 70;
-            // 
+            //
+            // tabPage6
+            //
+            tabPage6.Controls.Add(containerSplitContainer);
+            tabPage6.Location = new System.Drawing.Point(4, 24);
+            tabPage6.Name = "tabPage6";
+            tabPage6.Size = new System.Drawing.Size(472, 607);
+            tabPage6.TabIndex = 3;
+            tabPage6.Text = "Container Hierarchy";
+            tabPage6.UseVisualStyleBackColor = true;
+            //
+            // containerSplitContainer
+            //
+            containerSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            containerSplitContainer.Location = new System.Drawing.Point(0, 0);
+            containerSplitContainer.Name = "containerSplitContainer";
+            //
+            // containerSplitContainer.Panel1
+            //
+            containerSplitContainer.Panel1.Controls.Add(containerTreeView);
+            containerSplitContainer.Panel1.Controls.Add(containerTreeSearch);
+            //
+            // containerSplitContainer.Panel2
+            //
+            containerSplitContainer.Panel2.Controls.Add(containerListView);
+            containerSplitContainer.Size = new System.Drawing.Size(472, 607);
+            containerSplitContainer.SplitterDistance = 160;
+            containerSplitContainer.TabIndex = 0;
+            //
+            // containerTreeSearch
+            //
+            containerTreeSearch.Dock = System.Windows.Forms.DockStyle.Top;
+            containerTreeSearch.ForeColor = System.Drawing.SystemColors.WindowText;
+            containerTreeSearch.Location = new System.Drawing.Point(0, 0);
+            containerTreeSearch.Name = "containerTreeSearch";
+            containerTreeSearch.PlaceholderText = "Search folders...";
+            containerTreeSearch.Size = new System.Drawing.Size(160, 23);
+            containerTreeSearch.TabIndex = 0;
+            containerTreeSearch.TextChanged += containerTreeSearch_TextChanged;
+            containerTreeSearch.KeyDown += containerTreeSearch_KeyDown;
+            //
+            // containerTreeView
+            //
+            containerTreeView.CheckBoxes = true;
+            containerTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            containerTreeView.HideSelection = false;
+            containerTreeView.Location = new System.Drawing.Point(0, 23);
+            containerTreeView.Name = "containerTreeView";
+            containerTreeView.Size = new System.Drawing.Size(160, 584);
+            containerTreeView.TabIndex = 1;
+            containerTreeView.AfterSelect += containerTreeView_AfterSelect;
+            containerTreeView.AfterCheck += containerTreeView_AfterCheck;
+            //
+            // containerListView
+            //
+            containerListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { containerColumnName, containerColumnContainer, containerColumnType, containerColumnPathID, containerColumnSize });
+            containerListView.CheckBoxes = true;
+            containerListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            containerListView.FullRowSelect = true;
+            containerListView.GridLines = true;
+            containerListView.Location = new System.Drawing.Point(0, 0);
+            containerListView.Name = "containerListView";
+            containerListView.Size = new System.Drawing.Size(308, 607);
+            containerListView.TabIndex = 0;
+            containerListView.UseCompatibleStateImageBehavior = false;
+            containerListView.View = System.Windows.Forms.View.Details;
+            containerListView.VirtualMode = true;
+            containerListView.RetrieveVirtualItem += containerListView_RetrieveVirtualItem;
+            containerListView.ItemSelectionChanged += containerListView_ItemSelectionChanged;
+            containerListView.MouseClick += containerListView_MouseClick;
+            //
+            // containerColumnName
+            //
+            containerColumnName.Text = "Name";
+            containerColumnName.Width = 120;
+            //
+            // containerColumnContainer
+            //
+            containerColumnContainer.Text = "Container";
+            containerColumnContainer.Width = 80;
+            //
+            // containerColumnType
+            //
+            containerColumnType.Text = "Type";
+            containerColumnType.Width = 70;
+            //
+            // containerColumnPathID
+            //
+            containerColumnPathID.Text = "PathID";
+            //
+            // containerColumnSize
+            //
+            containerColumnSize.Text = "Size";
+            containerColumnSize.Width = 50;
+            //
             // progressbarPanel
             // 
             progressbarPanel.Controls.Add(progressBar1);
@@ -1403,6 +1513,12 @@ namespace AssetStudio.GUI
             tabPage2.ResumeLayout(false);
             tabPage2.PerformLayout();
             tabPage3.ResumeLayout(false);
+            tabPage6.ResumeLayout(false);
+            containerSplitContainer.Panel1.ResumeLayout(false);
+            containerSplitContainer.Panel1.PerformLayout();
+            containerSplitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)containerSplitContainer).EndInit();
+            containerSplitContainer.ResumeLayout(false);
             progressbarPanel.ResumeLayout(false);
             tabControl2.ResumeLayout(false);
             tabPage4.ResumeLayout(false);
@@ -1477,6 +1593,16 @@ namespace AssetStudio.GUI
         private System.Windows.Forms.ListView classesListView;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.SplitContainer containerSplitContainer;
+        private System.Windows.Forms.TextBox containerTreeSearch;
+        private System.Windows.Forms.TreeView containerTreeView;
+        private System.Windows.Forms.ListView containerListView;
+        private System.Windows.Forms.ColumnHeader containerColumnName;
+        private System.Windows.Forms.ColumnHeader containerColumnContainer;
+        private System.Windows.Forms.ColumnHeader containerColumnType;
+        private System.Windows.Forms.ColumnHeader containerColumnPathID;
+        private System.Windows.Forms.ColumnHeader containerColumnSize;
         private System.Windows.Forms.TextBox classTextBox;
         private System.Windows.Forms.ToolStripMenuItem exportClassStructuresMenuItem;
         private System.Windows.Forms.Label FMODcopyright;
