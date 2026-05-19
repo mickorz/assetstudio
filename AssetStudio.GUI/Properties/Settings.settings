@@ -126,7 +126,7 @@
       <Value Profile="(Default)">zh-CN</Value>
     </Setting>
     <Setting Name="enableParseLog" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>
