@@ -95,6 +95,8 @@ namespace AssetStudio
 
         private void Load(string[] files)
         {
+            ParseLogger.BeginSession(files);
+
             foreach (var file in files)
             {
                 Logger.Verbose($"caching {file} path and name to filter out duplicates");
@@ -105,7 +107,7 @@ namespace AssetStudio
             Progress.Reset();
 
             // Parallel file loading with dynamic dependency handling
-            // Files are processed in waves: load current batch in parallel, 
+            // Files are processed in waves: load current batch in parallel,
             // then process any new dependencies that were discovered
             int processedCount = 0;
             int totalProgress = 0;
@@ -168,6 +170,8 @@ namespace AssetStudio
                 ReadAssets();
                 ProcessAssets();
             }
+
+            ParseLogger.EndSession();
         }
 
         /// <summary>
@@ -423,6 +427,7 @@ namespace AssetStudio
             catch (Exception e)
             {
                 Logger.Error($"Error while reading assets file {reader.FullPath}", e);
+                ParseLogger.LogError(reader.FullPath, "LoadAssetsFile", e, sourceType: reader.FileType.ToString());
                 reader.Dispose();
             }
         }
@@ -478,6 +483,7 @@ namespace AssetStudio
             catch (Exception e)
             {
                 Logger.Error($"Error while reading assets file {reader.FullPath} from {Path.GetFileName(originalPath)}", e);
+                ParseLogger.LogError(reader.FullPath, "LoadAssetsFromMemory", e, originalPath: originalPath, sourceType: reader.FileType.ToString());
                 resourceFileReaders.TryAdd(reader.FileName, reader);
             }
         }
@@ -523,6 +529,7 @@ namespace AssetStudio
             catch (InvalidCastException)
             {
                 Logger.Error($"Game type mismatch, Expected {nameof(Mr0k)} but got {Game.Name} ({Game.GetType().Name}) !!");
+                ParseLogger.LogError(reader.FullPath, "LoadBundleFile", new InvalidCastException($"Expected {nameof(Mr0k)} but got {Game.GetType().Name}"), originalPath: originalPath);
             }
             catch (Exception e)
             {
@@ -532,6 +539,7 @@ namespace AssetStudio
                     str += $" from {Path.GetFileName(originalPath)}";
                 }
                 Logger.Error(str, e);
+                ParseLogger.LogError(reader.FullPath, "LoadBundleFile", e, originalPath: originalPath, sourceType: "BundleFile");
             }
             finally
             {
@@ -570,6 +578,7 @@ namespace AssetStudio
             catch (Exception e)
             {
                 Logger.Error($"Error while reading web file {reader.FullPath}", e);
+                ParseLogger.LogError(reader.FullPath, "LoadWebFile", e, sourceType: "WebFile");
             }
             finally
             {
@@ -630,6 +639,7 @@ namespace AssetStudio
                         catch (Exception e)
                         {
                             Logger.Error($"Error while reading zip split file {basePath}", e);
+                            ParseLogger.LogError(basePath, "LoadZipFile.Split", e);
                         }
                     }
 
@@ -661,6 +671,7 @@ namespace AssetStudio
                         catch (Exception e)
                         {
                             Logger.Error($"Error while reading zip entry {entry.FullName}", e);
+                            ParseLogger.LogError(entry.FullName, "LoadZipFile.Entry", e, originalPath: reader.FullPath);
                         }
                     }
                 }
@@ -668,6 +679,7 @@ namespace AssetStudio
             catch (Exception e)
             {
                 Logger.Error($"Error while reading zip file {reader.FileName}", e);
+                ParseLogger.LogError(reader.FullPath, "LoadZipFile", e, sourceType: "ZipFile");
             }
             finally
             {
@@ -705,6 +717,7 @@ namespace AssetStudio
             catch (Exception e)
             {
                 Logger.Error($"Error while reading block file {reader.FileName}", e);
+                ParseLogger.LogError(reader.FullPath, "LoadBlockFile", e, sourceType: "BlockFile");
             }
             finally
             {
@@ -738,10 +751,12 @@ namespace AssetStudio
             catch (InvalidCastException)
             {
                 Logger.Error($"Game type mismatch, Expected {nameof(Blk)} but got {Game.Name} ({Game.GetType().Name}) !!");
+                ParseLogger.LogError(reader.FullPath, "LoadBlkFile", new InvalidCastException($"Expected {nameof(Blk)} but got {Game.GetType().Name}"));
             }
             catch (Exception e)
             {
                 Logger.Error($"Error while reading blk file {reader.FileName}", e);
+                ParseLogger.LogError(reader.FullPath, "LoadBlkFile", e, sourceType: "BlkFile");
             }
             finally
             {
@@ -776,6 +791,7 @@ namespace AssetStudio
             catch (InvalidCastException)
             {
                 Logger.Error($"Game type mismatch, Expected {nameof(Mhy)} but got {Game.Name} ({Game.GetType().Name}) !!");
+                ParseLogger.LogError(reader.FullPath, "LoadMhyFile", new InvalidCastException($"Expected {nameof(Mhy)} but got {Game.GetType().Name}"), originalPath: originalPath);
             }
             catch (Exception e)
             {
@@ -785,6 +801,7 @@ namespace AssetStudio
                     str += $" from {Path.GetFileName(originalPath)}";
                 }
                 Logger.Error(str, e);
+                ParseLogger.LogError(reader.FullPath, "LoadMhyFile", e, originalPath: originalPath, sourceType: "MhyFile");
             }
             finally
             {
@@ -824,6 +841,7 @@ namespace AssetStudio
                     str += $" from {Path.GetFileName(originalPath)}";
                 }
                 Logger.Error(str, e);
+                ParseLogger.LogError(reader.FullPath, "LoadBlbFile", e, originalPath: originalPath, sourceType: "BlbFile");
             }
             finally
             {
@@ -1000,6 +1018,15 @@ namespace AssetStudio
                             .AppendLine($"PathID {objectInfo.m_PathID}")
                             .Append(e);
                         Logger.Error(sb.ToString());
+                        ParseLogger.LogError(
+                            assetsFile.originalPath ?? assetsFile.fileName,
+                            "ReadAssets",
+                            e,
+                            originalPath: assetsFile.originalPath,
+                            sourceType: assetsFile.fileName,
+                            assetName: objectReader.type.ToString(),
+                            assetType: objectReader.type.ToString(),
+                            pathID: objectInfo.m_PathID);
                     }
 
                     Progress.Report(++i, progressCount);

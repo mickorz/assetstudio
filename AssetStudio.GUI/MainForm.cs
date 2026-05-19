@@ -219,6 +219,7 @@ namespace AssetStudio.GUI
             clearConsoleToolStripMenuItem.Text = Lang.T("Menu.ClearConsole");
             enableFileLogging.Text = Lang.T("Menu.EnableFileLogging");
             loggedEventsMenuItem.Text = Lang.T("Menu.LoggedEvents");
+            enableParseLog.Text = Lang.T("Menu.EnableParseLog");
 
             // Misc 菜单
             miscToolStripMenuItem.Text = Lang.T("Menu.Misc");
@@ -294,6 +295,8 @@ namespace AssetStudio.GUI
             MiHoYoBinData.Encrypted = Properties.Settings.Default.encrypted;
             MiHoYoBinData.Key = Properties.Settings.Default.key;
             AssetsHelper.Minimal = Properties.Settings.Default.minimalAssetMap;
+            enableParseLog.Checked = Properties.Settings.Default.enableParseLog;
+            ParseLogger.Enabled = Properties.Settings.Default.enableParseLog;
         }
 
         private void InitializeLogger()
@@ -2974,6 +2977,13 @@ namespace AssetStudio.GUI
             Properties.Settings.Default.Save();
 
             Logger.FileLogging = enableFileLogging.Checked;
+        }
+
+        private void enableParseLog_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.enableParseLog = enableParseLog.Checked;
+            Properties.Settings.Default.Save();
+            ParseLogger.Enabled = enableParseLog.Checked;
         }
 
         private void loggedEventsMenuItem_DropDownClosing(object sender, ToolStripDropDownClosingEventArgs e)

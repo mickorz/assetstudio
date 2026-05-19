@@ -107,6 +107,7 @@ namespace AssetStudio.GUI
             clearConsoleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             enableFileLogging = new System.Windows.Forms.ToolStripMenuItem();
             loggedEventsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            enableParseLog = new System.Windows.Forms.ToolStripMenuItem();
             miscToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             MapNameComboBox = new System.Windows.Forms.ToolStripComboBox();
             buildMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -698,7 +699,7 @@ namespace AssetStudio.GUI
             // 
             // debugMenuItem
             // 
-            debugMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripMenuItem15, exportClassStructuresMenuItem, enableConsole, clearConsoleToolStripMenuItem, enableFileLogging, loggedEventsMenuItem });
+            debugMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripMenuItem15, exportClassStructuresMenuItem, enableConsole, clearConsoleToolStripMenuItem, enableFileLogging, loggedEventsMenuItem, enableParseLog });
             debugMenuItem.Name = "debugMenuItem";
             debugMenuItem.Size = new System.Drawing.Size(54, 20);
             debugMenuItem.Text = "Debug";
@@ -754,7 +755,15 @@ namespace AssetStudio.GUI
             loggedEventsMenuItem.Text = "Logged events";
             loggedEventsMenuItem.DropDown.Closing += loggedEventsMenuItem_DropDownClosing;
             loggedEventsMenuItem.DropDownClosed += loggedEventsMenuItem_DropDownClosed;
-            // 
+            //
+            // enableParseLog
+            //
+            enableParseLog.Name = "enableParseLog";
+            enableParseLog.Size = new System.Drawing.Size(191, 22);
+            enableParseLog.Text = "Enable Parse Log";
+            enableParseLog.CheckOnClick = true;
+            enableParseLog.CheckedChanged += enableParseLog_CheckedChanged;
+            //
             // miscToolStripMenuItem
             // 
             miscToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MapNameComboBox, buildMapToolStripMenuItem, buildBothToolStripMenuItem, clearMapToolStripMenuItem, toolStripSeparator7, assetMapNameTextBox, buildAssetMapToolStripMenuItem, assetMapTypeMenuItem, toolStripSeparator8, loadAIToolStripMenuItem, loadCABMapToolStripMenuItem, assetBrowserToolStripMenuItem });
@@ -1700,6 +1709,7 @@ namespace AssetStudio.GUI
         private System.Windows.Forms.ToolStripMenuItem loadCABMapToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem allowDuplicates;
         private System.Windows.Forms.ToolStripMenuItem languageToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem enableParseLog;
     }
 }
 

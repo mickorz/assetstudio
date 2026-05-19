@@ -66,6 +66,7 @@
   "Menu.ClearConsole": "清空控制台",
   "Menu.EnableFileLogging": "启用文件日志",
   "Menu.LoggedEvents": "日志事件",
+  "Menu.EnableParseLog": "启用解析日志",
 
   "Menu.Misc": "其他",
   "Menu.MapNameTip": "在此输入 Map 名称",

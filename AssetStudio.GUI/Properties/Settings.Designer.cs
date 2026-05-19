@@ -517,5 +517,17 @@ namespace AssetStudio.GUI.Properties {
                 this["language"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enableParseLog {
+            get {
+                return ((bool)(this["enableParseLog"]));
+            }
+            set {
+                this["enableParseLog"] = value;
+            }
+        }
     }
 }
