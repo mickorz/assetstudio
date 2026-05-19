@@ -17,6 +17,7 @@ namespace AssetStudio.GUI
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Lang.LoadLanguage(Properties.Settings.Default.language);
             Application.Run(new MainForm());
         }
     }

@@ -25,7 +25,7 @@ namespace AssetStudio.GUI
             var str = Properties.Settings.Default.convertType.ToString();
             foreach (Control c in panel1.Controls)
             {
-                if (c.Text == str)
+                if ((c.Tag as string) == str)
                 {
                     ((RadioButton)c).Checked = true;
                     break;
@@ -66,6 +66,7 @@ namespace AssetStudio.GUI
 
             typesComboBox.SelectedIndex = 0;
             uvsComboBox.SelectedIndex = 0;
+            ApplyTranslations();
         }
 
         private void OKbutton_Click(object sender, EventArgs e)
@@ -78,7 +79,7 @@ namespace AssetStudio.GUI
             {
                 if (((RadioButton)c).Checked)
                 {
-                    Properties.Settings.Default.convertType = (ImageFormat)Enum.Parse(typeof(ImageFormat), c.Text);
+                    Properties.Settings.Default.convertType = (ImageFormat)Enum.Parse(typeof(ImageFormat), c.Tag as string);
                     break;
                 }
             }
@@ -219,7 +220,7 @@ namespace AssetStudio.GUI
                 sb.Append($"{type.Key}: {(type.Value.Item1 ? '\x2713' : '\x2717')}, {(type.Value.Item2 ? '\x2713' : '\x2717')}\n");
             }
 
-            toolTip.ToolTipTitle = "Type options status:";
+            toolTip.ToolTipTitle = Lang.T("ExportOptions.Tooltip.TypeStatus");
             toolTip.SetToolTip(typesComboBox, sb.ToString());
         }
 
@@ -231,7 +232,7 @@ namespace AssetStudio.GUI
                 sb.Append($"{uv.Key}: {uvTypesComboBox.Items[uv.Value.Item2]}, {(uv.Value.Item1 ? '\x2713' : '\x2717')}\n");
             }
 
-            toolTip.ToolTipTitle = "UVs options status:";
+            toolTip.ToolTipTitle = Lang.T("ExportOptions.Tooltip.UVStatus");
             toolTip.SetToolTip(uvsComboBox, sb.ToString());
         }
 
@@ -243,14 +244,14 @@ namespace AssetStudio.GUI
                 sb.Append($"{tex.Key}: {texTypeComboBox.Items[tex.Value]}\n");
             }
 
-            toolTip.ToolTipTitle = "Texture options status:";
+            toolTip.ToolTipTitle = Lang.T("ExportOptions.Tooltip.TextureStatus");
             toolTip.SetToolTip(texTypeComboBox, sb.ToString());
         }
 
         private void Key_MouseHover(object sender, EventArgs e)
         {
-            toolTip.ToolTipTitle = "Value";
-            toolTip.SetToolTip(key, "Key in Hex");
+            toolTip.ToolTipTitle = Lang.T("ExportOptions.Tooltip.Value");
+            toolTip.SetToolTip(key, Lang.T("ExportOptions.Tooltip.KeyHex"));
         }
 
         private void Reset_Click(object sender, EventArgs e)
@@ -270,6 +271,74 @@ namespace AssetStudio.GUI
         {
             DialogResult = DialogResult.Cancel;
             Close();
+        }
+
+        private void ApplyTranslations()
+        {
+            Text = Lang.T("ExportOptions.Title");
+            groupBox1.Text = Lang.T("ExportOptions.Export");
+            // assetGroupOptions combo items
+            var savedGroupIndex = assetGroupOptions.SelectedIndex;
+            assetGroupOptions.Items.Clear();
+            assetGroupOptions.Items.AddRange(new object[] {
+                Lang.T("ExportOptions.Combo.TypeName"),
+                Lang.T("ExportOptions.Combo.ContainerPath"),
+                Lang.T("ExportOptions.Combo.SourceFileName"),
+                Lang.T("ExportOptions.Combo.DoNotGroup")
+            });
+            assetGroupOptions.SelectedIndex = savedGroupIndex;
+
+            // fbxFormat combo
+            var savedFbxFormatIndex = fbxFormat.SelectedIndex;
+            fbxFormat.Items.Clear();
+            fbxFormat.Items.AddRange(new object[] {
+                Lang.T("ExportOptions.Combo.Binary"),
+                Lang.T("ExportOptions.Combo.Ascii")
+            });
+            fbxFormat.SelectedIndex = savedFbxFormatIndex;
+
+            restoreExtensionName.Text = Lang.T("ExportOptions.RestoreExtensionName");
+            convertAudio.Text = Lang.T("ExportOptions.ConvertAudioClip");
+            openAfterExport.Text = Lang.T("ExportOptions.OpenAfterExport");
+            converttexture.Text = Lang.T("ExportOptions.ConvertTexture2D");
+            label7.Text = Lang.T("ExportOptions.GroupExportedAssetsBy");
+            label8.Text = Lang.T("ExportOptions.SelectedUnityTypeCan");
+            canExportCheckBox.Text = Lang.T("ExportOptions.CanExport");
+            canParseCheckBox.Text = Lang.T("ExportOptions.Parse");
+            addTexNameButton.Text = Lang.T("ExportOptions.Add");
+            removeTexNameButton.Text = Lang.T("ExportOptions.Remove");
+            label6.Text = Lang.T("ExportOptions.UVMappingOptions");
+            uvEnabledCheckBox.Text = Lang.T("ExportOptions.ExportUV");
+            label10.Text = Lang.T("ExportOptions.TextureMappingOptions");
+            minimalAssetMap.Text = Lang.T("ExportOptions.MinimalAssetMap");
+            encrypted.Text = Lang.T("ExportOptions.Encrypted");
+            collectAnimations.Text = Lang.T("ExportOptions.CollectAnimations");
+            exportMaterials.Text = Lang.T("ExportOptions.ExportMaterials");
+            groupBox2.Text = Lang.T("ExportOptions.Fbx");
+            exportBlendShape.Text = Lang.T("ExportOptions.ExportBlendshape");
+            exportAnimations.Text = Lang.T("ExportOptions.ExportAnimations");
+            exportSkins.Text = Lang.T("ExportOptions.ExportSkins");
+            exportAllNodes.Text = Lang.T("ExportOptions.ExportAllNodes");
+            castToBone.Text = Lang.T("ExportOptions.CastToBone");
+            eulerFilter.Text = Lang.T("ExportOptions.EulerFilter");
+            label1.Text = Lang.T("ExportOptions.FilterPrecision");
+            label2.Text = Lang.T("ExportOptions.BoneSize");
+            label5.Text = Lang.T("ExportOptions.ScaleFactor");
+            label4.Text = Lang.T("ExportOptions.FBXFormat");
+            label3.Text = Lang.T("ExportOptions.FBXVersion");
+            OKbutton.Text = Lang.T("ExportOptions.OK");
+            Cancel.Text = Lang.T("ExportOptions.Cancel");
+            Reset.Text = Lang.T("ExportOptions.Reset");
+
+            // RadioButton text + Tag (用于 OKbutton_Click 中通过 Tag 比较 ImageFormat 枚举值)
+            topng.Text = Lang.T("ExportOptions.Combo.Png");
+            topng.Tag = "Png";
+            tojpg.Text = Lang.T("ExportOptions.Combo.Jpeg");
+            tojpg.Tag = "Jpeg";
+            tobmp.Text = Lang.T("ExportOptions.Combo.Bmp");
+            tobmp.Tag = "Bmp";
+            totga.Text = Lang.T("ExportOptions.Combo.Tga");
+            totga.Tag = "Tga";
         }
     }
 }

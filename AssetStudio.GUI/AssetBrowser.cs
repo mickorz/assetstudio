@@ -24,6 +24,7 @@ namespace AssetStudio.GUI
         public AssetBrowser(MainForm form)
         {
             InitializeComponent();
+            ApplyTranslations();
             _parent = form;
             _filters = new Dictionary<string, Regex>();
             _assetEntries = new List<AssetEntry>();
@@ -33,11 +34,11 @@ namespace AssetStudio.GUI
         {
             loadAssetMap.Enabled = false;
 
-            var openFileDialog = new OpenFileDialog() { Multiselect = false, Filter = "MessagePack AssetMap File|*.map" };
+            var openFileDialog = new OpenFileDialog() { Multiselect = false, Filter = Lang.T("AssetBrowser.Filter.AssetMap") };
             if (openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 var path = openFileDialog.FileName;
-                Logger.Info($"Loading AssetMap...");
+                Logger.Info(Lang.T("AssetBrowser.Status.Loading"));
                 await Task.Run(() => ResourceMap.FromFile(path));
 
                 _sortedColumn = null;
@@ -66,7 +67,7 @@ namespace AssetStudio.GUI
         private void clear_Click(object sender, EventArgs e)
         {
             Clear();
-            Logger.Info($"Cleared !!");
+            Logger.Info(Lang.T("AssetBrowser.Status.Cleared"));
         }
         private void loadSelected_Click(object sender, EventArgs e)
         {
@@ -74,12 +75,12 @@ namespace AssetStudio.GUI
             var missingFiles = files.Where(x => !File.Exists(x));
             foreach (var file in missingFiles)
             {
-                Logger.Warning($"Unable to find file {file}, skipping...");
+                Logger.Warning(Lang.T("AssetBrowser.Status.FileNotFound", file));
                 files.Remove(file);
             }
             if (files.Count != 0 && !files.Any(string.IsNullOrEmpty))
             {
-                Logger.Info("Loading...");
+                Logger.Info(Lang.T("AssetBrowser.Status.Loading"));
                 _parent.Invoke(() => _parent.LoadPaths(files.ToArray()));
             }
         }
@@ -256,7 +257,7 @@ namespace AssetStudio.GUI
             }
             catch (Exception)
             {
-                Logger.Error($"Invalid regex {value}");
+                Logger.Error(Lang.T("AssetBrowser.Status.InvalidRegex", value));
                 return;
             }
 
@@ -392,6 +393,15 @@ namespace AssetStudio.GUI
         {
             ResourceMap.Clear();
             assetDataGridView.Rows.Clear();
+        }
+
+        private void ApplyTranslations()
+        {
+            Text = Lang.T("AssetBrowser.Title");
+            loadAssetMap.Text = Lang.T("AssetBrowser.LoadAssetMap");
+            clear.Text = Lang.T("AssetBrowser.Clear");
+            loadSelected.Text = Lang.T("AssetBrowser.LoadSelected");
+            exportSelected.Text = Lang.T("AssetBrowser.ExportSelected");
         }
     }
 }

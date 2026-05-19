@@ -80,7 +80,7 @@ namespace AssetStudio.GUI
 
         private static int ExtractBundleFile(FileReader reader, string savePath)
         {
-            StatusStripUpdate($"Decompressing {reader.FileName} ...");
+            StatusStripUpdate(Lang.T("Status.Decompressing", reader.FileName));
             try
             {
                 var bundleFile = new BundleFile(reader, Game);
@@ -93,14 +93,14 @@ namespace AssetStudio.GUI
             }
             catch (InvalidCastException)
             {
-                Logger.Error($"Game type mismatch, Expected {nameof(Mr0k)} but got {Game.Name} ({Game.GetType().Name}) !!");
+                Logger.Error(Lang.T("Status.GameTypeMismatch", nameof(Mr0k), Game.Name, Game.GetType().Name));
             }
             return 0;
         }
 
         private static int ExtractWebDataFile(FileReader reader, string savePath)
         {
-            StatusStripUpdate($"Decompressing {reader.FileName} ...");
+            StatusStripUpdate(Lang.T("Status.Decompressing", reader.FileName));
             var webFile = new WebFile(reader);
             reader.Dispose();
             if (webFile.fileList.Count > 0)
@@ -114,7 +114,7 @@ namespace AssetStudio.GUI
         private static int ExtractBlkFile(FileReader reader, string savePath)
         {
             int total = 0;
-            StatusStripUpdate($"Decompressing {reader.FileName} ...");
+            StatusStripUpdate(Lang.T("Status.Decompressing", reader.FileName));
             try
             {
                 using var stream = BlkUtils.Decrypt(reader, (Blk)Game);
@@ -137,7 +137,7 @@ namespace AssetStudio.GUI
             }
             catch (InvalidCastException)
             {
-                Logger.Error($"Game type mismatch, Expected {nameof(Blk)} but got {Game.Name} ({Game.GetType().Name}) !!");
+                Logger.Error(Lang.T("Status.GameTypeMismatch", nameof(Blk), Game.Name, Game.GetType().Name));
             }
             return total;
         }
@@ -145,7 +145,7 @@ namespace AssetStudio.GUI
         private static int ExtractBlockFile(FileReader reader, string savePath)
         {
             int total = 0;
-            StatusStripUpdate($"Decompressing {reader.FileName} ...");
+            StatusStripUpdate(Lang.T("Status.Decompressing", reader.FileName));
             using var stream = new OffsetStream(reader.BaseStream, 0);
             do
             {
@@ -160,7 +160,7 @@ namespace AssetStudio.GUI
 
         private static int ExtractMhyFile(FileReader reader, string savePath)
         {
-            StatusStripUpdate($"Decompressing {reader.FileName} ...");
+            StatusStripUpdate(Lang.T("Status.Decompressing", reader.FileName));
             try
             {
                 var mhy0File = new MhyFile(reader, (Mhy)Game);
@@ -173,7 +173,7 @@ namespace AssetStudio.GUI
             }
             catch (InvalidCastException)
             {
-                Logger.Error($"Game type mismatch, Expected {nameof(Mhy)} but got {Game.Name} ({Game.GetType().Name}) !!");
+                Logger.Error(Lang.T("Status.GameTypeMismatch", nameof(Mhy), Game.Name, Game.GetType().Name));
             }
             return 0;
         }
@@ -206,7 +206,7 @@ namespace AssetStudio.GUI
         {
             if (exportableAssets.Count > 0)
             {
-                Logger.Info("Updating Containers...");
+                Logger.Info(Lang.T("Status.UpdatingContainers"));
                 foreach (var asset in exportableAssets)
                 {
                     if (int.TryParse(asset.Container, out var value))
@@ -227,13 +227,13 @@ namespace AssetStudio.GUI
                         }
                     }
                 }
-                Logger.Info("Updated !!");
+                Logger.Info(Lang.T("Status.Updated"));
             }
         }
 
         public static (string, List<TreeNode>) BuildAssetData()
         {
-            StatusStripUpdate("Building asset list...");
+            StatusStripUpdate(Lang.T("Status.BuildingAssetList"));
 
             int i = 0;
             string productName = null;
@@ -248,7 +248,7 @@ namespace AssetStudio.GUI
                 {
                     if (assetsManager.tokenSource.IsCancellationRequested)
                     {
-                        Logger.Info("Building asset list has been cancelled !!");
+                        Logger.Info(Lang.T("Status.BuildingAssetListCancelled"));
                         return (string.Empty, Array.Empty<TreeNode>().ToList());
                     }
                     var assetItem = new AssetItem(asset);
@@ -338,7 +338,7 @@ namespace AssetStudio.GUI
             {
                 if (assetsManager.tokenSource.IsCancellationRequested)
                 {
-                    Logger.Info("Processing asset namnes has been cancelled !!");
+                    Logger.Info(Lang.T("Status.ProcessingNamesCancelled"));
                     return (string.Empty, Array.Empty<TreeNode>().ToList());
                 }
                 if (pptr.TryGet<MiHoYoBinData>(out var obj))
@@ -358,7 +358,7 @@ namespace AssetStudio.GUI
                 {
                     if (assetsManager.tokenSource.IsCancellationRequested)
                     {
-                        Logger.Info("Processing containers been cancelled !!");
+                        Logger.Info(Lang.T("Status.ProcessingContainersCancelled"));
                         return (string.Empty, Array.Empty<TreeNode>().ToList());
                     }
                     if (pptr.TryGet(out var obj))
@@ -376,7 +376,7 @@ namespace AssetStudio.GUI
             {
                 if (assetsManager.tokenSource.IsCancellationRequested)
                 {
-                    Logger.Info("Processing subitems been cancelled !!");
+                    Logger.Info(Lang.T("Status.ProcessingSubitemsCancelled"));
                     return (string.Empty, Array.Empty<TreeNode>().ToList());
                 }
                 tmp.SetSubItems();
@@ -384,7 +384,7 @@ namespace AssetStudio.GUI
 
             visibleAssets = exportableAssets;
 
-            StatusStripUpdate("Building tree structure...");
+            StatusStripUpdate(Lang.T("Status.BuildingTreeStructure"));
 
             var treeNodeCollection = new List<TreeNode>();
             var treeNodeDictionary = new Dictionary<GameObject, GameObjectTreeNode>();
@@ -403,7 +403,7 @@ namespace AssetStudio.GUI
                     {
                         if (assetsManager.tokenSource.IsCancellationRequested)
                         {
-                            Logger.Info("Building tree structure been cancelled !!");
+                            Logger.Info(Lang.T("Status.BuildingTreeStructureCancelled"));
                             return (string.Empty, Array.Empty<TreeNode>().ToList());
                         }
 
@@ -488,7 +488,7 @@ namespace AssetStudio.GUI
 
         public static List<ContainerTreeNode> BuildContainerHierarchy()
         {
-            StatusStripUpdate("Building container hierarchy...");
+            StatusStripUpdate(Lang.T("Status.BuildingContainerHierarchy"));
 
             var rootNodeMap = new Dictionary<string, ContainerTreeNode>();
             var noContainerAssets = new List<AssetItem>();
@@ -557,12 +557,12 @@ namespace AssetStudio.GUI
 
             if (noContainerAssets.Count > 0)
             {
-                var noContainerNode = new ContainerTreeNode("(No Container)", "");
+                var noContainerNode = new ContainerTreeNode(Lang.T("Container.NoContainer"), "");
                 noContainerNode.Assets.AddRange(noContainerAssets);
                 rootNodes.Add(noContainerNode);
             }
 
-            StatusStripUpdate("Container hierarchy built.");
+            StatusStripUpdate(Lang.T("Status.ContainerHierarchyBuilt"));
             return rootNodes;
         }
 
@@ -573,7 +573,7 @@ namespace AssetStudio.GUI
             {
                 if (assetsManager.tokenSource.IsCancellationRequested)
                 {
-                    Logger.Info("Processing class structure been cancelled !!");
+                    Logger.Info(Lang.T("Status.ProcessingClassStructureCancelled"));
                     return new Dictionary<string, SortedDictionary<int, TypeTreeItem>>();
                 }
                 if (typeMap.TryGetValue(assetsFile.unityVersion, out var curVer))
@@ -658,7 +658,7 @@ namespace AssetStudio.GUI
                     exportPath += Path.DirectorySeparatorChar;
 
                     var currentCount = Interlocked.Increment(ref i);
-                    StatusStripUpdate($"[{currentCount}/{toExportCount}] Exporting {asset.TypeString}: {asset.Text}");
+                    StatusStripUpdate(Lang.T("Status.ExportProgress", currentCount, toExportCount, asset.TypeString, asset.Text));
 
                     try
                     {
@@ -686,17 +686,17 @@ namespace AssetStudio.GUI
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"Export {asset.Type}:{asset.Text} error\r\n{ex.Message}\r\n{ex.StackTrace}");
+                        Logger.Error(Lang.T("Status.ExportError", asset.Type, asset.Text, ex.Message, ex.StackTrace));
                     }
 
                     Progress.Report(currentCount, toExportCount);
                 });
 
-                var statusText = exportedCount == 0 ? "Nothing exported." : $"Finished exporting {exportedCount} assets.";
+                var statusText = exportedCount == 0 ? Lang.T("Status.NothingExported") : Lang.T("Status.FinishedExporting", exportedCount);
 
                 if (toExportCount > exportedCount)
                 {
-                    statusText += $" {toExportCount - exportedCount} assets skipped (not extractable or files already exist)";
+                    statusText += Lang.T("Status.AssetsSkipped", toExportCount - exportedCount);
                 }
 
                 StatusStripUpdate(statusText);
@@ -747,7 +747,7 @@ namespace AssetStudio.GUI
                         break;
                 }
 
-                var statusText = $"Finished exporting asset list with {toExportAssets.Count()} items.";
+                var statusText = Lang.T("Status.FinishedExportingAssetList", toExportAssets.Count());
 
                 StatusStripUpdate(statusText);
 
@@ -802,25 +802,25 @@ namespace AssetStudio.GUI
                         }
                         Directory.CreateDirectory(targetPath);
                         //导出FBX
-                        StatusStripUpdate($"Exporting {filename}.fbx");
+                        StatusStripUpdate(Lang.T("Status.Exporting", filename + ".fbx"));
                         try
                         {
                             ExportGameObject(j.gameObject, targetPath);
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error($"Export GameObject:{j.Text} error\r\n{ex.Message}\r\n{ex.StackTrace}");
+                            Logger.Error(Lang.T("Status.ExportError", "GameObject", j.Text, ex.Message, ex.StackTrace));
                         }
 
                         Progress.Report(++k, count);
-                        StatusStripUpdate($"Finished exporting {filename}.fbx");
+                        StatusStripUpdate(Lang.T("Status.FinishedExportingName", filename + ".fbx"));
                     }
                 }
                 if (Properties.Settings.Default.openAfterExport)
                 {
                     OpenFolderInExplorer(savePath);
                 }
-                StatusStripUpdate("Finished");
+                StatusStripUpdate(Lang.T("Status.Finished"));
 
                 IEnumerable<TreeNode> GetNodes(TreeNodeCollection nodes)
                 {
@@ -857,7 +857,7 @@ namespace AssetStudio.GUI
             return Task.Run(() =>
             {
                 Progress.Reset();
-                StatusStripUpdate($"Exporting {animator.Text}");
+                StatusStripUpdate(Lang.T("Status.Exporting", animator.Text));
                 try
                 {
                     ExportAnimator(animator, exportPath, animationList);
@@ -866,12 +866,12 @@ namespace AssetStudio.GUI
                         OpenFolderInExplorer(exportPath);
                     }
                     Progress.Report(1, 1);
-                    StatusStripUpdate($"Finished exporting {animator.Text}");
+                    StatusStripUpdate(Lang.T("Status.FinishedExportingName", animator.Text));
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"Export Animator:{animator.Text} error\r\n{ex.Message}\r\n{ex.StackTrace}");
-                    StatusStripUpdate("Error in export");
+                    Logger.Error(Lang.T("Status.ExportError", "Animator", animator.Text, ex.Message, ex.StackTrace));
+                    StatusStripUpdate(Lang.T("Status.ErrorInExport"));
                 }
             });
         }
@@ -889,17 +889,17 @@ namespace AssetStudio.GUI
                     Progress.Reset();
                     foreach (var gameObject in gameObjects)
                     {
-                        StatusStripUpdate($"Exporting {gameObject.m_Name}");
+                        StatusStripUpdate(Lang.T("Status.Exporting", gameObject.m_Name));
                         try
                         {
                             var subExportPath = Path.Combine(exportPath, gameObject.m_Name) + Path.DirectorySeparatorChar;
                             ExportGameObject(gameObject, subExportPath, animationList);
-                            StatusStripUpdate($"Finished exporting {gameObject.m_Name}");
+                            StatusStripUpdate(Lang.T("Status.FinishedExportingName", gameObject.m_Name));
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error($"Export GameObject:{gameObject.m_Name} error\r\n{ex.Message}\r\n{ex.StackTrace}");
-                            StatusStripUpdate("Error in export");
+                            Logger.Error(Lang.T("Status.ExportError", "GameObject", gameObject.m_Name, ex.Message, ex.StackTrace));
+                            StatusStripUpdate(Lang.T("Status.ErrorInExport"));
                         }
 
                         Progress.Report(++i, count);
@@ -911,7 +911,7 @@ namespace AssetStudio.GUI
                 }
                 else
                 {
-                    StatusStripUpdate("No Object selected for export.");
+                    StatusStripUpdate(Lang.T("Status.NoObjectSelected"));
                 }
             });
         }
@@ -922,17 +922,17 @@ namespace AssetStudio.GUI
             {
                 var name = Path.GetFileName(exportPath);
                 Progress.Reset();
-                StatusStripUpdate($"Exporting {name}");
+                StatusStripUpdate(Lang.T("Status.Exporting", name));
                 try
                 {
                     ExportGameObjectMerge(gameObjects, exportPath, animationList);
                     Progress.Report(1, 1);
-                    StatusStripUpdate($"Finished exporting {name}");
+                    StatusStripUpdate(Lang.T("Status.FinishedExportingName", name));
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"Export Model:{name} error\r\n{ex.Message}\r\n{ex.StackTrace}");
-                    StatusStripUpdate("Error in export");
+                    Logger.Error(Lang.T("Status.ExportModelError", name, ex.Message, ex.StackTrace));
+                    StatusStripUpdate(Lang.T("Status.ErrorInExport"));
                 }
                 if (Properties.Settings.Default.openAfterExport)
                 {
@@ -950,7 +950,7 @@ namespace AssetStudio.GUI
                 foreach (var node in nodes)
                 {
                     var name = node.Text;
-                    StatusStripUpdate($"Exporting {name}");
+                    StatusStripUpdate(Lang.T("Status.Exporting", name));
                     var gameObjects = new List<GameObject>();
                     GetSelectedParentNode(node.Nodes, gameObjects);
                     if (gameObjects.Count > 0)
@@ -960,17 +960,17 @@ namespace AssetStudio.GUI
                         {
                             ExportGameObjectMerge(gameObjects, subExportPath, animationList);
                             Progress.Report(++i, nodes.Count);
-                            StatusStripUpdate($"Finished exporting {name}");
+                            StatusStripUpdate(Lang.T("Status.FinishedExportingName", name));
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error($"Export Model:{name} error\r\n{ex.Message}\r\n{ex.StackTrace}");
-                            StatusStripUpdate("Error in export");
+                            Logger.Error(Lang.T("Status.ExportModelError", name, ex.Message, ex.StackTrace));
+                            StatusStripUpdate(Lang.T("Status.ErrorInExport"));
                         }
                     }
                     else
                     {
-                        StatusStripUpdate("Empty node selected for export.");
+                        StatusStripUpdate(Lang.T("Status.EmptyNodeSelected"));
                     }
                 }
                 if (Properties.Settings.Default.openAfterExport)
@@ -1000,7 +1000,7 @@ namespace AssetStudio.GUI
             if (!assemblyLoader.Loaded)
             {
                 var openFolderDialog = new OpenFolderDialog();
-                openFolderDialog.Title = "Select Assembly Folder";
+                openFolderDialog.Title = Lang.T("Status.SelectAssemblyFolder");
                 if (openFolderDialog.ShowDialog() == DialogResult.OK)
                 {
                     assemblyLoader.Load(openFolderDialog.Folder);

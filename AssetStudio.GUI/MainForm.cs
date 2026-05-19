@@ -99,6 +99,182 @@ namespace AssetStudio.GUI
 
             // Subscribe to version prompt event
             assetsManager.OnVersionPrompt += AssetsManager_OnVersionPrompt;
+
+            // 初始化语言菜单
+            InitializeLanguageMenu();
+            // 应用多语言翻译
+            ApplyTranslations();
+        }
+
+        private void InitializeLanguageMenu()
+        {
+            foreach (var langCode in Lang.AvailableLanguages)
+            {
+                var item = new ToolStripMenuItem(Lang.GetDisplayName(langCode))
+                {
+                    CheckOnClick = true,
+                    Tag = langCode,
+                    Checked = langCode == Lang.CurrentLanguage
+                };
+                item.Click += LanguageMenuItem_Click;
+                languageToolStripMenuItem.DropDownItems.Add(item);
+            }
+        }
+
+        private void LanguageMenuItem_Click(object sender, EventArgs e)
+        {
+            var item = (ToolStripMenuItem)sender;
+            var selectedCode = (string)item.Tag;
+            if (selectedCode == Lang.CurrentLanguage)
+            {
+                item.Checked = true;
+                return;
+            }
+            // 取消其他选项
+            foreach (ToolStripMenuItem dropItem in languageToolStripMenuItem.DropDownItems)
+            {
+                dropItem.Checked = dropItem == item;
+            }
+            Lang.LoadLanguage(selectedCode);
+            Properties.Settings.Default.language = selectedCode;
+            Properties.Settings.Default.Save();
+            ApplyTranslations();
+        }
+
+        private void ApplyTranslations()
+        {
+            // 主菜单
+            fileToolStripMenuItem.Text = Lang.T("Menu.File");
+            loadFileToolStripMenuItem.Text = Lang.T("Menu.LoadFile");
+            loadFolderToolStripMenuItem.Text = Lang.T("Menu.LoadFolder");
+            extractFileToolStripMenuItem.Text = Lang.T("Menu.ExtractFile");
+            extractFolderToolStripMenuItem.Text = Lang.T("Menu.ExtractFolder");
+            resetToolStripMenuItem.Text = Lang.T("Menu.Reset");
+            abortStripMenuItem.Text = Lang.T("Menu.Abort");
+
+            // Options 菜单
+            optionsToolStripMenuItem.Text = Lang.T("Menu.Options");
+            displayAll.Text = Lang.T("Menu.DisplayAllAssets");
+            enablePreview.Text = Lang.T("Menu.EnablePreview");
+            enableModelPreview.Text = Lang.T("Menu.EnableModelPreview");
+            modelsOnly.Text = Lang.T("Menu.FilterModelsOnly");
+            displayInfo.Text = Lang.T("Menu.DisplayAssetInfo");
+            enableResolveDependencies.Text = Lang.T("Menu.EnableResolveDependencies");
+            allowDuplicates.Text = Lang.T("Menu.AllowDuplicates");
+            skipContainer.Text = Lang.T("Menu.SkipContainerRecovery");
+            toolStripMenuItem14.Text = Lang.T("Menu.SpecifyUnityVersion");
+            specifyUnityCNKey.Text = Lang.T("Menu.SpecifyUnityCNKey");
+            toolStripMenuItem18.Text = Lang.T("Menu.SpecifyGame");
+            toolStripMenuItem19.Text = Lang.T("Menu.SpecifyAIVersion");
+            showExpOpt.Text = Lang.T("Menu.ExportOptions");
+            languageToolStripMenuItem.Text = Lang.T("Menu.Language");
+
+            // Model 菜单
+            modelToolStripMenuItem.Text = Lang.T("Menu.Model");
+            exportAllObjectssplitToolStripMenuItem1.Text = Lang.T("Menu.ExportAllObjectsSplit");
+            exportSelectedObjectsToolStripMenuItem.Text = Lang.T("Menu.ExportSelectedObjectsSplit");
+            exportSelectedObjectsWithAnimationClipToolStripMenuItem.Text = Lang.T("Menu.ExportSelectedObjectsSplitAnim");
+            exportSelectedObjectsmergeToolStripMenuItem.Text = Lang.T("Menu.ExportSelectedObjectsMerge");
+            exportSelectedObjectsmergeWithAnimationClipToolStripMenuItem.Text = Lang.T("Menu.ExportSelectedObjectsMergeAnim");
+            exportSelectedNodessplitToolStripMenuItem.Text = Lang.T("Menu.ExportSelectedNodesSplit");
+            exportSelectedNodessplitSelectedAnimationClipsToolStripMenuItem.Text = Lang.T("Menu.ExportSelectedNodesSplitAnim");
+
+            // Export 菜单
+            exportToolStripMenuItem.Text = Lang.T("Menu.Export");
+            exportAllAssetsMenuItem.Text = Lang.T("Menu.AllAssets");
+            exportSelectedAssetsMenuItem.Text = Lang.T("Menu.SelectedAssets");
+            exportFilteredAssetsMenuItem.Text = Lang.T("Menu.FilteredAssets");
+            exportAnimatorWithSelectedAnimationClipToolStripMenuItem.Text = Lang.T("Menu.AnimatorWithAnimClips");
+            // Raw 子菜单
+            toolStripMenuItem2.Text = Lang.T("Menu.Raw");
+            toolStripMenuItem4.Text = Lang.T("Menu.AllAssets");
+            toolStripMenuItem5.Text = Lang.T("Menu.SelectedAssets");
+            toolStripMenuItem6.Text = Lang.T("Menu.FilteredAssets");
+            // Dump 子菜单
+            toolStripMenuItem3.Text = Lang.T("Menu.Dump");
+            toolStripMenuItem7.Text = Lang.T("Menu.AllAssets");
+            toolStripMenuItem8.Text = Lang.T("Menu.SelectedAssets");
+            toolStripMenuItem9.Text = Lang.T("Menu.FilteredAssets");
+            // JSON 子菜单
+            toolStripMenuItem16.Text = Lang.T("Menu.JSON");
+            toolStripMenuItem17.Text = Lang.T("Menu.AllAssets");
+            toolStripMenuItem24.Text = Lang.T("Menu.SelectedAssets");
+            toolStripMenuItem25.Text = Lang.T("Menu.FilteredAssets");
+            // Asset list to XML 子菜单
+            toolStripMenuItem10.Text = Lang.T("Menu.AssetListToXML");
+            toolStripMenuItem11.Text = Lang.T("Menu.AllAssets");
+            toolStripMenuItem12.Text = Lang.T("Menu.SelectedAssets");
+            toolStripMenuItem13.Text = Lang.T("Menu.FilteredAssets");
+            sceneHierarchy.Text = Lang.T("Menu.SceneHierarchy");
+
+            // Filter Type 菜单
+            filterTypeToolStripMenuItem.Text = Lang.T("Menu.FilterType");
+            allToolStripMenuItem.Text = Lang.T("Menu.All");
+
+            // Debug 菜单
+            debugMenuItem.Text = Lang.T("Menu.Debug");
+            toolStripMenuItem15.Text = Lang.T("Menu.ShowErrorMessage");
+            exportClassStructuresMenuItem.Text = Lang.T("Menu.ExportClassStructures");
+            enableConsole.Text = Lang.T("Menu.EnableConsole");
+            clearConsoleToolStripMenuItem.Text = Lang.T("Menu.ClearConsole");
+            enableFileLogging.Text = Lang.T("Menu.EnableFileLogging");
+            loggedEventsMenuItem.Text = Lang.T("Menu.LoggedEvents");
+
+            // Misc 菜单
+            miscToolStripMenuItem.Text = Lang.T("Menu.Misc");
+            buildMapToolStripMenuItem.Text = Lang.T("Menu.BuildMap");
+            buildBothToolStripMenuItem.Text = Lang.T("Menu.BuildBoth");
+            clearMapToolStripMenuItem.Text = Lang.T("Menu.ClearMap");
+            buildAssetMapToolStripMenuItem.Text = Lang.T("Menu.BuildAssetMap");
+            assetMapTypeMenuItem.Text = Lang.T("Menu.AssetMapType");
+            loadAIToolStripMenuItem.Text = Lang.T("Menu.LoadAI");
+            loadCABMapToolStripMenuItem.Text = Lang.T("Menu.LoadCABMap");
+            assetBrowserToolStripMenuItem.Text = Lang.T("Menu.AssetBrowser");
+
+            // Tab 页
+            tabPage1.Text = Lang.T("Tab.SceneHierarchy");
+            tabPage2.Text = Lang.T("Tab.AssetList");
+            tabPage3.Text = Lang.T("Tab.AssetClasses");
+            tabPage6.Text = Lang.T("Tab.ContainerHierarchy");
+            tabPage4.Text = Lang.T("Tab.Preview");
+            tabPage5.Text = Lang.T("Tab.Dump");
+
+            // 列头 - Asset List
+            columnHeaderName.Text = Lang.T("Col.Name");
+            columnHeaderContainer.Text = Lang.T("Col.Container");
+            columnHeaderType.Text = Lang.T("Col.Type");
+            columnHeaderPathID.Text = Lang.T("Col.PathID");
+            columnHeaderSize.Text = Lang.T("Col.Size");
+
+            // 列头 - Asset Classes
+            columnHeader1.Text = Lang.T("Col.Name");
+            columnHeader2.Text = Lang.T("Col.ID");
+
+            // 列头 - Container Hierarchy
+            containerColumnName.Text = Lang.T("Col.Name");
+            containerColumnContainer.Text = Lang.T("Col.Container");
+            containerColumnType.Text = Lang.T("Col.Type");
+            containerColumnPathID.Text = Lang.T("Col.PathID");
+            containerColumnSize.Text = Lang.T("Col.Size");
+
+            // 搜索框占位符
+            treeSearch.Text = string.IsNullOrEmpty(treeSearch.Text) ? "" : treeSearch.Text;
+            // FMOD 控件
+            FMODcopyright.Text = Lang.T("FMOD.AudioEngineByFMOD");
+            FMODloopButton.Text = Lang.T("FMOD.Loop");
+            FMODstopButton.Text = Lang.T("FMOD.Stop");
+            FMODpauseButton.Text = Lang.T("FMOD.Pause");
+            FMODplayButton.Text = Lang.T("FMOD.Play");
+
+            // 上下文菜单
+            copyToolStripMenuItem.Text = Lang.T("Ctx.CopyText");
+            exportSelectedAssetsToolStripMenuItem.Text = Lang.T("Ctx.ExportSelectedAssets");
+            exportAnimatorwithselectedAnimationClipMenuItem.Text = Lang.T("Ctx.ExportAnimatorWithAnimClips");
+            goToSceneHierarchyToolStripMenuItem.Text = Lang.T("Ctx.GoToSceneHierarchy");
+            showOriginalFileToolStripMenuItem.Text = Lang.T("Ctx.ShowOriginalFile");
+
+            // 状态栏
+            toolStripStatusLabel1.Text = Lang.T("Status.Ready");
         }
 
         private void InitializeExportOptions()
@@ -168,7 +344,7 @@ namespace AssetStudio.GUI
             specifyGame.SelectedIndexChanged += new EventHandler(specifyGame_SelectedIndexChanged);
             Studio.Game = GameManager.GetGame(Properties.Settings.Default.selectedGame);
             TypeFlags.SetTypes(JsonConvert.DeserializeObject<Dictionary<ClassIDType, (bool, bool)>>(Properties.Settings.Default.types));
-            Logger.Info($"Target Game type is {Studio.Game.Type}");
+            Logger.Info(Lang.T("Misc.TargetGame", Studio.Game.Type));
 
             if (Studio.Game.Type.IsUnityCN())
             {
@@ -201,7 +377,7 @@ namespace AssetStudio.GUI
 
             using (var inputDialog = new Form())
             {
-                inputDialog.Text = "Unity Version Required";
+                inputDialog.Text = Lang.T("Dialog.UnityVersionRequired");
                 inputDialog.ClientSize = new Size(500, 280);
                 inputDialog.StartPosition = FormStartPosition.CenterParent;
                 inputDialog.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -210,7 +386,7 @@ namespace AssetStudio.GUI
 
                 var label = new Label
                 {
-                    Text = $"Unable to detect Unity version for:\n{e.FileName}\n\nPlease enter the Unity version:",
+                    Text = Lang.T("Dialog.UnableToDetectVersion", e.FileName),
                     Location = new Point(25, 20),
                     Width = 450,
                     Height = 80,
@@ -226,7 +402,7 @@ namespace AssetStudio.GUI
 
                 var exampleLabel = new Label
                 {
-                    Text = "Example: 2020.3.48f1 or 6000.0.58f2",
+                    Text = Lang.T("Dialog.ExampleVersion"),
                     Location = new Point(25, 145),
                     Width = 450,
                     Height = 30,
@@ -242,6 +418,7 @@ namespace AssetStudio.GUI
                     Height = 35,
                     DialogResult = DialogResult.OK
                 };
+                okButton.Text = Lang.T("Dialog.OK");
 
                 var cancelButton = new Button
                 {
@@ -251,6 +428,7 @@ namespace AssetStudio.GUI
                     Height = 35,
                     DialogResult = DialogResult.Cancel
                 };
+                cancelButton.Text = Lang.T("Dialog.Cancel");
 
                 inputDialog.Controls.Add(label);
                 inputDialog.Controls.Add(textBox);
@@ -351,13 +529,13 @@ namespace AssetStudio.GUI
             if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
                 var saveFolderDialog = new OpenFolderDialog();
-                saveFolderDialog.Title = "Select the save folder";
+                saveFolderDialog.Title = Lang.T("Dialog.SelectSaveFolder");
                 if (saveFolderDialog.ShowDialog(this) == DialogResult.OK)
                 {
                     var fileNames = openFileDialog1.FileNames;
                     var savePath = saveFolderDialog.Folder;
                     var extractedCount = await Task.Run(() => ExtractFile(fileNames, savePath));
-                    StatusStripUpdate($"Finished extracting {extractedCount} files.");
+                    StatusStripUpdate(Lang.T("Status.FinishedExtracting", extractedCount));
                 }
             }
         }
@@ -368,13 +546,13 @@ namespace AssetStudio.GUI
             if (openFolderDialog.ShowDialog(this) == DialogResult.OK)
             {
                 var saveFolderDialog = new OpenFolderDialog();
-                saveFolderDialog.Title = "Select the save folder";
+                saveFolderDialog.Title = Lang.T("Dialog.SelectSaveFolder");
                 if (saveFolderDialog.ShowDialog(this) == DialogResult.OK)
                 {
                     var path = openFolderDialog.Folder;
                     var savePath = saveFolderDialog.Folder;
                     var extractedCount = await Task.Run(() => ExtractFolder(path, savePath));
-                    StatusStripUpdate($"Finished extracting {extractedCount} files.");
+                    StatusStripUpdate(Lang.T("Status.FinishedExtracting", extractedCount));
                 }
             }
         }
@@ -383,7 +561,7 @@ namespace AssetStudio.GUI
         {
             if (assetsManager.assetsFileList.Count == 0)
             {
-                StatusStripUpdate("No Unity file can be loaded.");
+                StatusStripUpdate(Lang.T("Status.NoUnityFileLoaded"));
                 return;
             }
 
@@ -451,12 +629,12 @@ namespace AssetStudio.GUI
                 filterTypeToolStripMenuItem.DropDownItems.Add(typeItem);
             }
             allToolStripMenuItem.Checked = true;
-            var log = $"Finished loading {assetsManager.assetsFileList.Count} files with {assetListView.Items.Count} exportable assets";
+            var log = Lang.T("Status.FinishedLoading", assetsManager.assetsFileList.Count, assetListView.Items.Count);
             var m_ObjectsCount = assetsManager.assetsFileList.Sum(x => x.m_Objects.Count);
             var objectsCount = assetsManager.assetsFileList.Sum(x => x.Objects.Count);
             if (m_ObjectsCount != objectsCount)
             {
-                log += $" and {m_ObjectsCount - objectsCount} assets failed to read";
+                log += Lang.T("Status.FinishedLoadingWithErrors", m_ObjectsCount - objectsCount);
             }
             StatusStripUpdate(log);
             UpdateAssetCountStatus();
@@ -565,7 +743,7 @@ namespace AssetStudio.GUI
                         Progress.Report(++i, count);
                     }
 
-                    StatusStripUpdate("Finished exporting class structures");
+                    StatusStripUpdate(Lang.T("Status.FinishedExportingClassStructures"));
                 }
             }
         }
@@ -734,7 +912,7 @@ namespace AssetStudio.GUI
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error("Invalid Regex.\n" + ex.Message);
+                        Logger.Error(Lang.T("Search.InvalidRegex", ex.Message));
                         return;
                     }
                     var regex = new Regex(containerTreeSearch.Text, RegexOptions.IgnoreCase);
@@ -917,7 +1095,7 @@ namespace AssetStudio.GUI
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error("Invalid Regex.\n" + ex.Message);
+                        Logger.Error(Lang.T("Search.InvalidRegex", ex.Message));
                         return;
                     }
                     var regex = new Regex(treeSearch.Text, RegexOptions.IgnoreCase);
@@ -992,7 +1170,7 @@ namespace AssetStudio.GUI
 
         private void sceneHierarchy_Click(object sender, EventArgs e)
         {
-            var saveFileDialog = new SaveFileDialog() { FileName = "scene.json", Filter = "Scene Hierarchy dump | *.json" };
+            var saveFileDialog = new SaveFileDialog() { FileName = "scene.json", Filter = Lang.T("Dialog.SceneHierarchyDumpFilter") };
             if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 var path = saveFileDialog.FileName;
@@ -1004,7 +1182,7 @@ namespace AssetStudio.GUI
                 }
                 var json = JsonConvert.SerializeObject(nodes, Formatting.Indented);
                 File.WriteAllText(path, json);
-                Logger.Info("Scene Hierarchy dumped sucessfully !!");
+                Logger.Info(Lang.T("Dialog.SceneHierarchyDumped"));
             }
         }
 
@@ -1183,7 +1361,7 @@ namespace AssetStudio.GUI
                         break;
                     case VideoClip _:
                     case MovieTexture _:
-                        StatusStripUpdate("Only supported export.");
+                        StatusStripUpdate(Lang.T("Preview.OnlySupportedExport"));
                         break;
                     case Sprite m_Sprite:
                         PreviewSprite(assetItem, m_Sprite);
@@ -1197,7 +1375,7 @@ namespace AssetStudio.GUI
                         break;
                     case MiHoYoBinData m_MiHoYoBinData:
                         PreviewText(m_MiHoYoBinData.AsString);
-                        StatusStripUpdate("Can be exported/previewed as JSON if data is a valid JSON (check XOR).");
+                        StatusStripUpdate(Lang.T("Preview.JSONExportHint"));
                         break;
                     default:
                         var str = assetItem.Asset.Dump();
@@ -1265,11 +1443,11 @@ namespace AssetStudio.GUI
                 }
                 PreviewTexture(bitmap);
 
-                StatusStripUpdate("'Ctrl'+'R'/'G'/'B'/'A' for Channel Toggle");
+                StatusStripUpdate(Lang.T("Preview.ChannelToggle"));
             }
             else
             {
-                StatusStripUpdate("Unsupported image for preview");
+                StatusStripUpdate(Lang.T("Preview.UnsupportedImage"));
             }
         }
 
@@ -1403,12 +1581,12 @@ namespace AssetStudio.GUI
         {
             if (m_Shader.byteSize > 0xFFFFFFF)
             {
-                PreviewText("Shader is too large to parse");
+                PreviewText(Lang.T("Preview.ShaderTooLarge"));
                 return;
             }
 
             var str = m_Shader.Convert();
-            PreviewText(str == null ? "Serialized Shader can't be read" : str.Replace("\n", "\r\n"));
+            PreviewText(str == null ? Lang.T("Preview.ShaderCantBeRead") : str.Replace("\n", "\r\n"));
         }
 
         private void PreviewTextAsset(TextAsset m_TextAsset)
@@ -1477,7 +1655,7 @@ namespace AssetStudio.GUI
                     return;
                 }
             }
-            StatusStripUpdate("Unsupported font for preview. Try to export.");
+            StatusStripUpdate(Lang.T("Preview.UnsupportedFont"));
         }
 
         private void PreviewMesh(Mesh m_Mesh)
@@ -1488,7 +1666,7 @@ namespace AssetStudio.GUI
                 #region Vertices
                 if (m_Mesh.m_Vertices == null || m_Mesh.m_Vertices.Length == 0)
                 {
-                    StatusStripUpdate("Mesh can't be previewed.");
+                    StatusStripUpdate(Lang.T("Preview.MeshCantBePreviewed"));
                     return;
                 }
                 int count = 3;
@@ -1620,13 +1798,11 @@ namespace AssetStudio.GUI
                 #endregion
                 glControl.Visible = true;
                 CreateVAO();
-                StatusStripUpdate("Using OpenGL Version: " + GL.GetString(StringName.Version) + "\n"
-                                  + "'Mouse Left'=Rotate | 'Mouse Right'=Move | 'Mouse Wheel'=Zoom \n"
-                                  + "'Ctrl W'=Wireframe | 'Ctrl S'=Shade | 'Ctrl N'=ReNormal ");
+                StatusStripUpdate(Lang.T("Preview.OpenGLInfo", GL.GetString(StringName.Version) + "\n'Mouse Left'=Rotate | 'Mouse Right'=Move | 'Mouse Wheel'=Zoom\n'Ctrl W'=Wireframe | 'Ctrl S'=Shade | 'Ctrl N'=ReNormal"));
             }
             else
             {
-                StatusStripUpdate("Unable to preview this mesh");
+                StatusStripUpdate(Lang.T("Preview.UnableToPreviewMesh"));
             }
         }
 
@@ -1665,7 +1841,7 @@ namespace AssetStudio.GUI
         {
             var str = clip.Convert();
             if (string.IsNullOrEmpty(str))
-                str = "Legacy animation is not supported";
+                str = Lang.T("Preview.LegacyAnimationNotSupported");
             PreviewText(str.Replace("\n", "\r\n"));
         }
 
@@ -1737,13 +1913,11 @@ namespace AssetStudio.GUI
                 #endregion
                 glControl.Visible = true;
                 CreateVAO();
-                StatusStripUpdate("Using OpenGL Version: " + GL.GetString(StringName.Version) + "\n"
-                                  + "'Mouse Left'=Rotate | 'Mouse Right'=Move | 'Mouse Wheel'=Zoom \n"
-                                  + "'Ctrl W'=Wireframe | 'Ctrl S'=Shade | 'Ctrl N'=ReNormal ");
+                StatusStripUpdate(Lang.T("Preview.OpenGLInfo", GL.GetString(StringName.Version) + "\n'Mouse Left'=Rotate | 'Mouse Right'=Move | 'Mouse Wheel'=Zoom\n'Ctrl W'=Wireframe | 'Ctrl S'=Shade | 'Ctrl N'=ReNormal"));
             }
             else
             {
-                StatusStripUpdate("Unable to preview this model");
+                StatusStripUpdate(Lang.T("Preview.UnableToPreviewModel"));
             }
         }
 
@@ -1759,7 +1933,7 @@ namespace AssetStudio.GUI
             }
             else
             {
-                StatusStripUpdate("Unsupported sprite for preview.");
+                StatusStripUpdate(Lang.T("Preview.UnsupportedSprite"));
             }
         }
 
@@ -1849,7 +2023,7 @@ namespace AssetStudio.GUI
             }
 
             FMODreset();
-            StatusStripUpdate("Ready");
+            StatusStripUpdate(Lang.T("Status.Ready"));
         }
 
         private void assetListView_MouseClick(object sender, MouseEventArgs e)
@@ -1978,7 +2152,7 @@ namespace AssetStudio.GUI
             }
             else
             {
-                StatusStripUpdate("No Objects available for export");
+                StatusStripUpdate(Lang.T("Status.NoObjectsAvailable"));
             }
         }
 
@@ -2003,7 +2177,7 @@ namespace AssetStudio.GUI
                     var saveFileDialog = new SaveFileDialog();
                     saveFileDialog.FileName = gameObjects[0].m_Name + " (merge).fbx";
                     saveFileDialog.AddExtension = false;
-                    saveFileDialog.Filter = "Fbx file (*.fbx)|*.fbx";
+                    saveFileDialog.Filter = Lang.T("Dialog.FbxFileFilter");
                     saveFileDialog.InitialDirectory = saveDirectoryBackup;
                     if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
                     {
@@ -2023,7 +2197,7 @@ namespace AssetStudio.GUI
                 }
                 else
                 {
-                    StatusStripUpdate("No Object selected for export.");
+                    StatusStripUpdate(Lang.T("Status.NoObjectSelected"));
                 }
             }
         }
@@ -2051,7 +2225,7 @@ namespace AssetStudio.GUI
                     var roots = sceneTreeView.Nodes.Cast<TreeNode>().Where(x => x.Level == 0 && x.Checked).ToList();
                     if (roots.Count == 0)
                     {
-                        Logger.Info("No root nodes found selected.");
+                        Logger.Info(Lang.T("Status.NoRootNodesFound"));
                         return;
                     }
                     List<AssetItem> animationList = null;
@@ -2175,7 +2349,7 @@ namespace AssetStudio.GUI
             }
             else
             {
-                StatusStripUpdate("No Objects available for export");
+                StatusStripUpdate(Lang.T("Status.NoObjectsAvailable"));
             }
         }
 
@@ -2236,7 +2410,7 @@ namespace AssetStudio.GUI
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error("Invalid Regex.\n" + ex.Message);
+                    Logger.Error(Lang.T("Search.InvalidRegex", ex.Message));
                     listSearch.Text = "";
                 }
                 var regex = new Regex(listSearch.Text, RegexOptions.IgnoreCase);
@@ -2259,20 +2433,20 @@ namespace AssetStudio.GUI
             string statusText;
             if (selectedCount > 0)
             {
-                statusText = $"Selected: {selectedCount}";
+                statusText = Lang.T("Count.Selected", selectedCount);
                 if (filteredCount != totalCount)
                 {
-                    statusText += $" | Filtered: {filteredCount}";
+                    statusText += $" | {Lang.T("Count.Filtered", filteredCount)}";
                 }
-                statusText += $" | Total: {totalCount}";
+                statusText += $" | {Lang.T("Count.Total", totalCount)}";
             }
             else if (filteredCount != totalCount)
             {
-                statusText = $"Filtered: {filteredCount} | Total: {totalCount}";
+                statusText = $"{Lang.T("Count.Filtered", filteredCount)} | {Lang.T("Count.Total", totalCount)}";
             }
             else
             {
-                statusText = $"Total: {totalCount}";
+                statusText = Lang.T("Count.Total", totalCount);
             }
 
             if (InvokeRequired)
@@ -2332,13 +2506,13 @@ namespace AssetStudio.GUI
                     }
                     else
                     {
-                        StatusStripUpdate("No assets selected in Container Hierarchy.");
+                        StatusStripUpdate(Lang.T("Status.NoAssetsSelectedContainer"));
                     }
                 }
             }
             else
             {
-                StatusStripUpdate("No exportable assets loaded");
+                StatusStripUpdate(Lang.T("Status.NoExportableAssets"));
             }
         }
 
@@ -2370,7 +2544,7 @@ namespace AssetStudio.GUI
             }
             else
             {
-                StatusStripUpdate("No exportable assets loaded");
+                StatusStripUpdate(Lang.T("Status.NoExportableAssets"));
             }
         }
 
@@ -2404,7 +2578,7 @@ namespace AssetStudio.GUI
             }
             else
             {
-                StatusStripUpdate("No exportable assets loaded");
+                StatusStripUpdate(Lang.T("Status.NoExportableAssets"));
             }
         }
 
@@ -2437,7 +2611,7 @@ namespace AssetStudio.GUI
             }
             if (skipContainer.Checked)
             {
-                Logger.Info("Skip container is enabled, aborting...");
+                Logger.Info(Lang.T("Status.SkipContainerEnabled"));
                 return;
             }
             optionsToolStripMenuItem.DropDown.Visible = false;
@@ -2448,7 +2622,7 @@ namespace AssetStudio.GUI
                 version = version.Split(' ')[0];
             }
 
-            Logger.Info($"Loading AI v{version}");
+            Logger.Info(Lang.T("Misc.LoadingAI", version));
             InvokeUpdate(specifyAIVersion, false);
             var path = await AIVersionManager.FetchAI(version);
             await Task.Run(() => ResourceIndex.FromFile(path));
@@ -2461,12 +2635,12 @@ namespace AssetStudio.GUI
         {
             var selectedIndex = specifyAIVersion.SelectedIndex;
             specifyAIVersion.Items.Clear();
-            specifyAIVersion.Items.Add("None");
+            specifyAIVersion.Items.Add(Lang.T("FMOD.None"));
 
             var versions = AIVersionManager.GetVersions();
             foreach (var version in versions)
             {
-                specifyAIVersion.Items.Add(version.Item1 + (version.Item2 ? " (cached)" : ""));
+                specifyAIVersion.Items.Add(version.Item1 + (version.Item2 ? $" {Lang.T("Misc.Cached")}" : ""));
             }
 
             specifyAIVersion.SelectedIndexChanged -= new EventHandler(toolStripComboBox1_SelectedIndexChanged);
@@ -2478,7 +2652,7 @@ namespace AssetStudio.GUI
         {
             if (exportableAssets.Count > 0)
             {
-                Logger.Info("Updating Containers...");
+                Logger.Info(Lang.T("Misc.UpdatingContainers"));
                 assetListView.BeginUpdate();
                 foreach (var asset in exportableAssets)
                 {
@@ -2502,7 +2676,7 @@ namespace AssetStudio.GUI
                     }
                 }
                 assetListView.EndUpdate();
-                Logger.Info("Updated !!");
+                Logger.Info(Lang.T("Misc.Updated"));
             }
         }
 
@@ -2588,7 +2762,7 @@ namespace AssetStudio.GUI
             ResetForm();
 
             Studio.Game = GameManager.GetGame(Properties.Settings.Default.selectedGame);
-            Logger.Info($"Target Game is {Studio.Game.Name}");
+            Logger.Info(Lang.T("Misc.TargetGameSet", Studio.Game.Name));
 
             if (Studio.Game.Type.IsUnityCN())
             {
@@ -2639,7 +2813,7 @@ namespace AssetStudio.GUI
             {
                 if (input.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
                 {
-                    Logger.Warning("Name has invalid characters !!");
+                    Logger.Warning(Lang.T("Dialog.NameInvalidChars"));
                     InvokeUpdate(miscToolStripMenuItem, true);
                     return;
                 }
@@ -2648,14 +2822,14 @@ namespace AssetStudio.GUI
             }
             else
             {
-                Logger.Error("Map name is empty, please enter any name in ComboBox above");
+                Logger.Error(Lang.T("Dialog.MapNameEmpty"));
                 InvokeUpdate(miscToolStripMenuItem, true);
                 return;
             }
 
             if (File.Exists(Path.Combine(AssetsHelper.MapName, $"{name}.bin")))
             {
-                var acceptOverride = MessageBox.Show("Map already exist, Do you want to override it ?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                var acceptOverride = MessageBox.Show(Lang.T("Dialog.MapAlreadyExistOverride"), Lang.T("Dialog.Warning"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (acceptOverride != DialogResult.Yes)
                 {
                     InvokeUpdate(miscToolStripMenuItem, true);
@@ -2665,12 +2839,12 @@ namespace AssetStudio.GUI
 
             var version = specifyUnityVersion.Text;
             var openFolderDialog = new OpenFolderDialog();
-            openFolderDialog.Title = "Select Game Folder";
+            openFolderDialog.Title = Lang.T("Dialog.SelectGameFolder");
             if (openFolderDialog.ShowDialog(this) == DialogResult.OK)
             {
-                Logger.Info("Scanning for files...");
+                Logger.Info(Lang.T("Misc.ScanningFiles"));
                 var files = Directory.GetFiles(openFolderDialog.Folder, "*.*", SearchOption.AllDirectories).ToArray();
-                Logger.Info($"Found {files.Length} files");
+                Logger.Info(Lang.T("Misc.FoundFiles", files.Length));
                 AssetsHelper.SetUnityVersion(version);
                 await Task.Run(() => AssetsHelper.BuildCABMap(files, name, openFolderDialog.Folder, Studio.Game));
             }
@@ -2695,7 +2869,7 @@ namespace AssetStudio.GUI
             {
                 if (input.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
                 {
-                    Logger.Warning("Name has invalid characters !!");
+                    Logger.Warning(Lang.T("Dialog.NameInvalidChars"));
                     InvokeUpdate(miscToolStripMenuItem, true);
                     return;
                 }
@@ -2704,14 +2878,14 @@ namespace AssetStudio.GUI
             }
             else
             {
-                Logger.Error("Map name is empty, please enter any name in ComboBox above");
+                Logger.Error(Lang.T("Dialog.MapNameEmpty"));
                 InvokeUpdate(miscToolStripMenuItem, true);
                 return;
             }
 
             if (File.Exists(Path.Combine(AssetsHelper.MapName, $"{name}.bin")))
             {
-                var acceptOverride = MessageBox.Show("Map already exist, Do you want to override it ?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                var acceptOverride = MessageBox.Show(Lang.T("Dialog.MapAlreadyExistOverride"), Lang.T("Dialog.Warning"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (acceptOverride != DialogResult.Yes)
                 {
                     InvokeUpdate(miscToolStripMenuItem, true);
@@ -2721,16 +2895,16 @@ namespace AssetStudio.GUI
 
             var version = specifyUnityVersion.Text;
             var openFolderDialog = new OpenFolderDialog();
-            openFolderDialog.Title = "Select Game Folder";
+            openFolderDialog.Title = Lang.T("Dialog.SelectGameFolder");
             if (openFolderDialog.ShowDialog(this) == DialogResult.OK)
             {
-                Logger.Info("Scanning for files...");
+                Logger.Info(Lang.T("Misc.ScanningFiles"));
                 var files = Directory.GetFiles(openFolderDialog.Folder, "*.*", SearchOption.AllDirectories).ToArray();
-                Logger.Info($"Found {files.Length} files");
+                Logger.Info(Lang.T("Misc.FoundFiles", files.Length));
 
                 var saveFolderDialog = new OpenFolderDialog();
                 saveFolderDialog.InitialFolder = saveDirectoryBackup;
-                saveFolderDialog.Title = "Select Output Folder";
+                saveFolderDialog.Title = Lang.T("Dialog.SelectOutputFolder");
                 if (saveFolderDialog.ShowDialog(this) == DialogResult.OK)
                 {
                     saveDirectoryBackup = saveFolderDialog.Folder;
@@ -2746,7 +2920,7 @@ namespace AssetStudio.GUI
             miscToolStripMenuItem.DropDown.Visible = false;
             InvokeUpdate(miscToolStripMenuItem, false);
 
-            var acceptDelete = MessageBox.Show("Map will be deleted, this can't be undone, continue ?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            var acceptDelete = MessageBox.Show(Lang.T("Dialog.MapWillBeDeleted"), Lang.T("Dialog.Warning"), MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (acceptDelete != DialogResult.Yes)
             {
                 InvokeUpdate(miscToolStripMenuItem, true);
@@ -2758,7 +2932,7 @@ namespace AssetStudio.GUI
             if (File.Exists(path))
             {
                 File.Delete(path);
-                Logger.Info($"{name} deleted successfully !!");
+                Logger.Info(Lang.T("Dialog.NameDeleted", name));
                 MapNameComboBox.SelectedIndexChanged -= new EventHandler(specifyNameComboBox_SelectedIndexChanged);
                 MapNameComboBox.SelectedIndex = 0;
                 MapNameComboBox.SelectedIndexChanged += new EventHandler(specifyNameComboBox_SelectedIndexChanged);
@@ -2820,7 +2994,7 @@ namespace AssetStudio.GUI
 
         private void abortStripMenuItem_Click(object sender, EventArgs e)
         {
-            Logger.Info("Aborting....");
+            Logger.Info(Lang.T("Misc.Aborting"));
             assetsManager.tokenSource.Cancel();
             AssetsHelper.tokenSource.Cancel();
         }
@@ -2829,16 +3003,16 @@ namespace AssetStudio.GUI
         {
             if (skipContainer.Checked)
             {
-                Logger.Info("Skip container is enabled, aborting...");
+                Logger.Info(Lang.T("Status.SkipContainerEnabled"));
                 return;
             }
             miscToolStripMenuItem.DropDown.Visible = false;
 
-            var openFileDialog = new OpenFileDialog() { Multiselect = false, Filter = "Asset Index JSON File|*.json" };
+            var openFileDialog = new OpenFileDialog() { Multiselect = false, Filter = Lang.T("Misc.AssetIndexFilter") };
             if (openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 var path = openFileDialog.FileName;
-                Logger.Info($"Loading AI...");
+                Logger.Info(Lang.T("Misc.LoadingAI2"));
                 InvokeUpdate(loadAIToolStripMenuItem, false);
                 await Task.Run(() => ResourceIndex.FromFile(path));
                 UpdateContainers();
@@ -2850,7 +3024,7 @@ namespace AssetStudio.GUI
         {
             miscToolStripMenuItem.DropDown.Visible = false;
 
-            var openFileDialog = new OpenFileDialog() { Multiselect = false, Filter = "CABMap File|*.bin" };
+            var openFileDialog = new OpenFileDialog() { Multiselect = false, Filter = Lang.T("Misc.CABMapFilter") };
             if (openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 var path = openFileDialog.FileName;
@@ -2878,7 +3052,7 @@ namespace AssetStudio.GUI
             {
                 if (input.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
                 {
-                    Logger.Warning("Name has invalid characters !!");
+                    Logger.Warning(Lang.T("Dialog.NameInvalidChars"));
                     InvokeUpdate(miscToolStripMenuItem, true);
                     return;
                 }
@@ -2888,16 +3062,16 @@ namespace AssetStudio.GUI
 
             var version = specifyUnityVersion.Text;
             var openFolderDialog = new OpenFolderDialog();
-            openFolderDialog.Title = $"Select Game Folder";
+            openFolderDialog.Title = Lang.T("Dialog.SelectGameFolder");
             if (openFolderDialog.ShowDialog(this) == DialogResult.OK)
             {
-                Logger.Info("Scanning for files...");
+                Logger.Info(Lang.T("Misc.ScanningFiles"));
                 var files = Directory.GetFiles(openFolderDialog.Folder, "*.*", SearchOption.AllDirectories).ToArray();
-                Logger.Info($"Found {files.Length} files");
+                Logger.Info(Lang.T("Misc.FoundFiles", files.Length));
 
                 var saveFolderDialog = new OpenFolderDialog();
                 saveFolderDialog.InitialFolder = saveDirectoryBackup;
-                saveFolderDialog.Title = "Select Output Folder";
+                saveFolderDialog.Title = Lang.T("Dialog.SelectOutputFolder");
                 if (saveFolderDialog.ShowDialog(this) == DialogResult.OK)
                 {
                     AssetsHelper.SetUnityVersion(version);
@@ -2931,7 +3105,7 @@ namespace AssetStudio.GUI
             ERRCHECK(result);
             if (version < FMOD.VERSION.number)
             {
-                Logger.Error($"Error!  You are using an old version of FMOD {version:X}.  This program requires {FMOD.VERSION.number:X}.");
+                Logger.Error(Lang.T("FMOD.OldVersionError", $"{version:X}", $"{FMOD.VERSION.number:X}"));
                 Application.Exit();
             }
 
@@ -2950,7 +3124,7 @@ namespace AssetStudio.GUI
             timer.Stop();
             FMODprogressBar.Value = 0;
             FMODtimerLabel.Text = "0:00.0 / 0:00.0";
-            FMODstatusLabel.Text = "Stopped";
+            FMODstatusLabel.Text = Lang.T("FMOD.Stopped");
             FMODinfoLabel.Text = "";
 
             if (sound != null && sound.isValid())
@@ -2980,13 +3154,13 @@ namespace AssetStudio.GUI
                     result = system.playSound(sound, null, false, out channel);
                     if (ERRCHECK(result)) { return; }
 
-                    FMODpauseButton.Text = "Pause";
+                    FMODpauseButton.Text = Lang.T("FMOD.Pause");
                 }
                 else
                 {
                     result = system.playSound(sound, null, false, out channel);
                     if (ERRCHECK(result)) { return; }
-                    FMODstatusLabel.Text = "Playing";
+                    FMODstatusLabel.Text = Lang.T("FMOD.Playing");
 
                     if (FMODprogressBar.Value > 0)
                     {
@@ -3022,14 +3196,14 @@ namespace AssetStudio.GUI
 
                     if (paused)
                     {
-                        FMODstatusLabel.Text = "Playing";
-                        FMODpauseButton.Text = "Pause";
+                        FMODstatusLabel.Text = Lang.T("FMOD.Playing");
+                        FMODpauseButton.Text = Lang.T("FMOD.Pause");
                         timer.Start();
                     }
                     else
                     {
-                        FMODstatusLabel.Text = "Paused";
-                        FMODpauseButton.Text = "Resume";
+                        FMODstatusLabel.Text = Lang.T("FMOD.Paused");
+                        FMODpauseButton.Text = Lang.T("FMOD.Resume");
                         timer.Stop();
                     }
                 }
@@ -3055,8 +3229,8 @@ namespace AssetStudio.GUI
                     timer.Stop();
                     FMODprogressBar.Value = 0;
                     FMODtimerLabel.Text = "0:00.0 / 0:00.0";
-                    FMODstatusLabel.Text = "Stopped";
-                    FMODpauseButton.Text = "Pause";
+                    FMODstatusLabel.Text = Lang.T("FMOD.Stopped");
+                    FMODpauseButton.Text = Lang.T("FMOD.Pause");
                 }
             }
         }
@@ -3169,7 +3343,7 @@ namespace AssetStudio.GUI
 
             FMODtimerLabel.Text = $"{ms / 1000 / 60}:{ms / 1000 % 60}.{ms / 10 % 100} / {FMODlenms / 1000 / 60}:{FMODlenms / 1000 % 60}.{FMODlenms / 10 % 100}";
             FMODprogressBar.Value = (int)(ms * 1000 / FMODlenms);
-            FMODstatusLabel.Text = paused ? "Paused " : playing ? "Playing" : "Stopped";
+            FMODstatusLabel.Text = paused ? Lang.T("FMOD.Paused") + " " : playing ? Lang.T("FMOD.Playing") : Lang.T("FMOD.Stopped");
 
             if (system != null && channel != null)
             {
@@ -3182,7 +3356,7 @@ namespace AssetStudio.GUI
             if (result != FMOD.RESULT.OK)
             {
                 FMODreset();
-                StatusStripUpdate($"FMOD error! {result} - {FMOD.Error.String(result)}");
+                StatusStripUpdate(Lang.T("FMOD.Error", result, FMOD.Error.String(result)));
                 return true;
             }
             return false;

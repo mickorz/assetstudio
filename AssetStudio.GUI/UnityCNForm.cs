@@ -11,6 +11,7 @@ namespace AssetStudio.GUI
         public UnityCNForm()
         {
             InitializeComponent();
+            ApplyTranslations();
 
             var keys = UnityCNManager.GetEntries();
 
@@ -76,6 +77,14 @@ namespace AssetStudio.GUI
 
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void ApplyTranslations()
+        {
+            Text = Lang.T("UnityCN.Title");
+            // DataGridView columns
+            specifyUnityCNList.Columns["NameField"].HeaderText = Lang.T("UnityCN.ColumnName");
+            specifyUnityCNList.Columns["KeyField"].HeaderText = Lang.T("UnityCN.ColumnKey");
         }
     }
 }
